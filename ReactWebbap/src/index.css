@@ -1,40 +1,36 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
 body {
-  margin: 0;
+	background: #afd0e5;
+	font-family: "Open Sans", sans-serif;
+}
+
+.carousel-control-prev, .carousel-control-next {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.25); /* Fondo oscuro semitransparente */
+  color: white; /* Color de los iconos */
   display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  z-index: 1;
+  transition: background-color 0.3s ease; /* Transición solo para el fondo */
+  padding: 0; /* Elimina cualquier padding que pueda afectar el tamaño */
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* Flechas dentro de los botones */
+.carousel-control-prev-icon, .carousel-control-next-icon {
+  background-color: #7ac400; /* Color de las flechas */
+  transition: background-color 0.3s ease; /* Transición suave para el color de las flechas */
 }
 
+/* Cambio de color de las flechas al pasar el ratón */
+.carousel-control-prev:hover .carousel-control-prev-icon,
+.carousel-control-next:hover .carousel-control-next-icon {
+  background-color: #7ac400; /* Cambiar color de las flechas */
+}
+
+/* Estilos generales para los botones */
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -46,23 +42,209 @@ button {
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
+/* Solo cambio del borde al hacer hover en los botones genéricos */
 button:hover {
   border-color: #646cff;
 }
+
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* Estilos del cuerpo */
+body {
+  background: #e2eaef;
+  font-family: "Open Sans", sans-serif;
+}
+
+/* Título */
+h2 {
+  color: #000;
+  font-size: 26px;
+  font-weight: 300;
+  text-align: center;
+  text-transform: uppercase;
+  position: relative;
+  margin: 30px 0 60px;
+}
+
+h2::after {
+  content: "";
+  width: 100px;
+  position: absolute;
+  margin: 0 auto;
+  height: 4px;
+  border-radius: 1px;
+  background: #7ac400;
+  left: 0;
+  right: 0;
+  bottom: -20px;
+}
+
+/* Carrusel */
+.carousel {
+  margin: 50px auto;
+  padding: 0 70px;
+}
+
+.carousel .item {
+  color: #747d89;
+  min-height: 325px;
+  text-align: center;
+  overflow: hidden;
+}
+
+.carousel .thumb-wrapper {
+  padding: 25px 15px;
+  background: #fff;
+  border-radius: 6px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 2px 3px rgba(0,0,0,0.2);
+}
+
+.carousel .item .img-box {
+  height: 120px;
+  margin-bottom: 20px;
+  width: 100%;
+  position: relative;
+}
+
+.carousel .item img {
+  max-width: 100%;
+  max-height: 100%;
+  display: inline-block;
+  position: absolute;
+  bottom: 0;
+  margin: 0 auto;
+  left: 0;
+  right: 0;
+}
+
+.carousel .item h4 {
+  font-size: 18px;
+}
+
+.carousel .item h4, .carousel .item p, .carousel .item ul {
+  margin-bottom: 5px;
+}
+
+.carousel .thumb-content .btn {
+  color: #7ac400;
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: bold;
+  background: none;
+  border: 1px solid #7ac400;
+  padding: 6px 14px;
+  margin-top: 5px;
+  line-height: 16px;
+  border-radius: 20px;
+}
+
+.carousel .thumb-content .btn:hover, .carousel .thumb-content .btn:focus {
+  color: #fff;
+  background: #7ac400;
+  box-shadow: none;
+}
+
+.carousel .thumb-content .btn i {
+  font-size: 14px;
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+.carousel .carousel-control {
+  height: 44px;
+  width: 40px;
+  background: #7ac400;  
+  margin: auto 0;
+  border-radius: 4px;
+  opacity: 0.8;
+}
+
+.carousel .carousel-control:hover {
+  background: #78bf00;
+}
+
+.carousel .carousel-control i {
+  font-size: 36px;
+  position: absolute;
+  top: 50%;
+  display: inline-block;
+  margin: -19px 0 0 0;
+  z-index: 5;
+  left: 0;
+  right: 0;
+  color: #fff;
+  text-shadow: none;
+  font-weight: bold;
+}
+
+.carousel .item-price {
+  font-size: 13px;
+  padding: 2px 0;
+}
+
+.carousel .item-price strike {
+  opacity: 0.7;
+  margin-right: 5px;
+}
+
+.carousel .carousel-control.left i {
+  margin-left: -2px;
+}
+
+.carousel .carousel-control.right i {
+  margin-right: -4px;
+}
+
+.carousel .carousel-indicators {
+  bottom: -50px;
+}
+
+.carousel-indicators li, .carousel-indicators li.active {
+  width: 10px;
+  height: 10px;
+  margin: 4px;
+  border-radius: 50%;
+  border: none;
+}
+
+.carousel-indicators li {  
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.carousel-indicators li.active {  
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.carousel .wish-icon {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  z-index: 99;
+  cursor: pointer;
+  font-size: 16px;
+  color: #abb0b8;
+}
+
+.carousel .wish-icon .fa-heart {
+  color: #ff6161;
+}
+
+.star-rating li {
+  padding: 0;
+}
+
+.star-rating i {
+  font-size: 14px;
+  color: #ffc000;
+}
+
+/* Ajuste de las flechas de navegación */
+.carousel-control-prev-icon, .carousel-control-next-icon {
+  background-color: #7ac400; /* Color de las flechas */
 }
