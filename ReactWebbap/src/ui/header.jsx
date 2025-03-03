@@ -1,12 +1,13 @@
 import React from "react";
 import "./header.css";
+import logo from "../assets/logo.png";
 
 function Header() {
     return(
         <div className="header">
             <div className="row">
                 <div className="col">
-                    Logo
+                    <img src={logo} alt="Logo" className="logo" />
                 </div>
                 <div className="col">
                     Buscador
