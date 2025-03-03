@@ -1,0 +1,1 @@
+// src/services/firebaseConfig.jsx
