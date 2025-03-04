@@ -14,7 +14,7 @@ function Header() {
         <span>Total: $0.00</span>
       </div>
       <div className="session-order mx-3">
-        <button className="btn btn-primary">Sesión/Pedido</button>
+        <button className="btn btn-success">Sesión/Pedido</button>
       </div>
     </header>
   );
