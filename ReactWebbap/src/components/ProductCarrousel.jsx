@@ -6,6 +6,7 @@ import 'font-awesome/css/font-awesome.min.css';
 function ProductCarousel({ productos }) {
   const [activeIndex] = useState(0);
   const [itemsPerRow, setItemsPerRow] = useState(getItemsPerRow());
+  const [cantidadProductos, setCantidadProductos] = useState({});
 
   function getItemsPerRow() { // Definimos número de elementos necesarios
     const width = window.innerWidth;
@@ -30,6 +31,20 @@ function ProductCarousel({ productos }) {
   };
 
   const productChunks = chunkArray(productos, itemsPerRow);
+
+  const handleIncrement = (id) => {
+    setCantidadProductos((prev) => ({
+      ...prev,
+      [id]: (prev[id] || 0) + 1,
+    }));
+  };
+
+  const handleDecrement = (id) => {
+    setCantidadProductos((prev) => ({
+      ...prev,
+      [id]: Math.max((prev[id] || 0) - 1, 0),
+    }));
+  };
 
   return (
     <div className="container">
@@ -69,9 +84,28 @@ function ProductCarousel({ productos }) {
                             <p className="item-price">
                               <b>€{producto.precio}</b>
                             </p>
-                            <a href="#" className="btn btn-primary">
-                              Add to Cart
-                            </a>
+                            {/* Controles de cantidad */}
+                            <div className="d-flex justify-content-center align-items-center contador-container bg-light p-2 rounded">
+                              <button
+                                className="btn btn-danger mx-2"
+                                onClick={() => handleDecrement(producto.id)}
+                                onMouseUp={(e) => e.currentTarget.blur()}
+                                onBlur={(e) => e.currentTarget.blur()}
+                              >
+                                −
+                              </button>
+
+                              <span className="fw-bold">{cantidadProductos[producto.id] || 0}</span>
+
+                              <button
+                                className="btn btn-success mx-2"
+                                onClick={() => handleIncrement(producto.id)}
+                                onMouseUp={(e) => e.currentTarget.blur()}
+                                onBlur={(e) => e.currentTarget.blur()}
+                              >
+                                +
+                              </button>
+                            </div>
                           </div>
                         </div>
                       </div>
