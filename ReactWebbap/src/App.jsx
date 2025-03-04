@@ -1,12 +1,19 @@
 // src/App.jsx
 import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home'; // Importa la página Home
+import Footer from './components/ui/Footer';
+import Header from './components/ui/Header';
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />  {/* Aquí manejas solo las rutas */}
-    </Routes>
+    <div>
+      <Header />
+      <Routes>
+        <Route path="/" element={<Home />} /> {/* Aquí manejas solo las rutas */}
+      </Routes>
+      <Footer />
+    </div>
+
   );
 }
 
