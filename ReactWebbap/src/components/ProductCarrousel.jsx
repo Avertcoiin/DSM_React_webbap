@@ -49,7 +49,7 @@ function ProductCarousel({ productos }) {
                         <div className="thumb-wrapper w-100">
                           <div className="img-box">
                             <img
-                              src=  {producto.archivo} //"src/assets/jarron1.webp"
+                              src={producto.archivo} //"src/assets/jarron1.webp" 
                               className="img-responsive w-80"
                             />
                           </div>
