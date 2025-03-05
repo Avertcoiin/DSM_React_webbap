@@ -34,14 +34,19 @@ export const CartProvider = ({ children }) => {
     setCartItems((prevItems) => prevItems.filter(item => item.id !== productId));
   };
 
+  // Función para vaciar el carrito
+  const clearCart = () => {
+    setCartItems([]); // Vaciamos el carrito
+  };
+
   // Función para calcular el precio total
   const getTotalPrice = () => {
     return cartItems.reduce((total, item) => total + item.precio * item.cantidad, 0);
   };
 
-  
+
   return (
-    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, getTotalPrice }}>
+    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, getTotalPrice, clearCart }}>
       {children}
     </CartContext.Provider>
   );
