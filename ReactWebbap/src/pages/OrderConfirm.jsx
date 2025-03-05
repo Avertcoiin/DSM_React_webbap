@@ -3,7 +3,7 @@ import React from 'react';
 import { useCart } from '../context/CartContext'; // Importamos el contexto del carrito
 
 function OrderConfirm() {
-  const { cartItems, getTotalPrice } = useCart(); // Obtenemos los productos del carrito y el precio total
+  const { cartItems, getTotalPrice, clearCart } = useCart(); // Obtenemos los productos del carrito, el precio total y la función para borrar
 
   return (
     <div className="container my-5">
@@ -24,9 +24,9 @@ function OrderConfirm() {
                     <div className="card-img-container" style={{ flex: 1 }}>
                       <img
                         src={item.archivo} // Usamos la propiedad archivo directamente para obtener la imagen
-                        className="img-fluid" // Mantener la imagen fluida
+                        className="img-fluid"
                         alt={item.nombre}
-                        style={{ width: '35%', objectFit: 'cover' }} // Cambiar tamaño de la imagen
+                        style={{ width: '35%', objectFit: 'cover' }}
                       />
                     </div>
 
@@ -46,7 +46,7 @@ function OrderConfirm() {
             </div>
           </div>
 
-          {/* Columna de la derecha (resumen de pedido) */}
+          {/* Columna de la derecha (resumen de pedido + botones) */}
           <div className="col-md-4">
             <div className="card">
               <div className="card-body">
@@ -63,6 +63,12 @@ function OrderConfirm() {
                 {/* Total del carrito */}
                 <div className="mt-3 text-right">
                   <h4 className="fw-bold">Total: {getTotalPrice().toFixed(2)}€</h4>
+                </div>
+
+                {/* Botones de acción */}
+                <div className="d-flex flex-column mt-3">
+                  <button className="btn btn-success btn-lg mb-2">CONTINUAR</button>
+                  <button className="btn btn-danger btn-lg" onClick={clearCart}>BORRAR PEDIDO</button>
                 </div>
               </div>
             </div>
