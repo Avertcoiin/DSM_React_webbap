@@ -39,42 +39,44 @@ function ProductCarousel({ productos }) {
   // handleIncrement para aumentar la cantidad del producto
   const handleIncrement = useCallback((id) => {
     setCantidadProductos((prev) => {
-      const newCantidad = (prev[id] || 0) + 1;
+      const newCantidad = (prev[id] || 0) + 1; // Calculamos la nueva cantidad
       const product = productos.find(p => p.id === id);
 
       console.log(`Incrementando ${product.nombre}, Cantidad: ${newCantidad}`);
 
-      // Actualizar carrito solo después de cambiar la cantidad
+      // Actualizamos el carrito con la cantidad del estado `cantidadProductos`
       addToCart({
         id: product.id,
         nombre: product.nombre,
         precio: product.precio,
-        cantidad: newCantidad,
+        cantidad: newCantidad, // Usamos la cantidad actualizada del estado `cantidadProductos`
       });
 
-      return { ...prev, [id]: newCantidad };
+      return { ...prev, [id]: newCantidad }; // Actualizamos el estado `cantidadProductos`
     });
   }, [productos, addToCart]);
 
   // handleDecrement para disminuir la cantidad del producto
   const handleDecrement = useCallback((id) => {
     setCantidadProductos((prev) => {
-      const newCantidad = Math.max((prev[id] || 0) - 1, 0);
+      const newCantidad = Math.max((prev[id] || 0) - 1, 0); // Calculamos la nueva cantidad
       const product = productos.find(p => p.id === id);
 
       console.log(`Decrementando ${product.nombre}, Cantidad: ${newCantidad}`);
 
-      // Actualizar carrito solo después de cambiar la cantidad
+      // Actualizamos el carrito con la cantidad del estado `cantidadProductos`
       addToCart({
         id: product.id,
         nombre: product.nombre,
         precio: product.precio,
-        cantidad: newCantidad,
+        cantidad: newCantidad, // Usamos la cantidad actualizada del estado `cantidadProductos`
       });
 
-      return { ...prev, [id]: newCantidad };
+      return { ...prev, [id]: newCantidad }; // Actualizamos el estado `cantidadProductos`
     });
   }, [productos, addToCart]);
+
+
 
   /* const handleIncrement = (id) => {
     setCantidadProductos((prev) => {
