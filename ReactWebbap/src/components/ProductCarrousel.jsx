@@ -49,7 +49,8 @@ function ProductCarousel({ productos }) {
         id: product.id,
         nombre: product.nombre,
         precio: product.precio,
-        cantidad: newCantidad, // Usamos la cantidad actualizada del estado `cantidadProductos`
+        cantidad: newCantidad,
+        archivo: product.archivo,
       });
 
       return { ...prev, [id]: newCantidad }; // Actualizamos el estado `cantidadProductos`
@@ -69,7 +70,8 @@ function ProductCarousel({ productos }) {
         id: product.id,
         nombre: product.nombre,
         precio: product.precio,
-        cantidad: newCantidad, // Usamos la cantidad actualizada del estado `cantidadProductos`
+        cantidad: newCantidad,
+        archivo: product.archivo,
       });
 
       return { ...prev, [id]: newCantidad }; // Actualizamos el estado `cantidadProductos`

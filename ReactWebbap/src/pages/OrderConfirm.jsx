@@ -1,4 +1,3 @@
-// src/pages/OrderConfirm.jsx
 import React from 'react';
 import { useCart } from '../context/CartContext'; // Importamos el contexto del carrito
 
@@ -19,19 +18,19 @@ function OrderConfirm() {
             <div className="row">
               {cartItems.map((item) => (
                 <div key={item.id} className="col-12 mb-4">
-                  <div className="card" style={{ display: 'flex', flexDirection: 'row', padding: '20px' }}>
+                  <div className="card d-flex flex-row p-3">
                     {/* Imagen del producto */}
                     <div className="card-img-container" style={{ flex: 1 }}>
                       <img
-                        src={item.archivo || "default_image_url"} // Usa la URL de la imagen del producto, si existe
-                        className="img-fluid"
+                        src={item.archivo} // Usamos la propiedad archivo directamente para obtener la imagen
+                        className="img-fluid" // Mantener la imagen fluida
                         alt={item.nombre}
-                        style={{ maxHeight: '200px', objectFit: 'cover' }}
+                        style={{ width: '35%', objectFit: 'cover' }} // Aquí cambiamos a 25% de su tamaño original
                       />
                     </div>
 
                     {/* Contenido del producto */}
-                    <div className="card-body" style={{ flex: 2, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                    <div className="card-body d-flex flex-column justify-content-between" style={{ flex: 2 }}>
                       <h5 className="card-title">{item.nombre}</h5>
                       <p className="card-text">€{item.precio}</p>
                       <p className="card-text">Cantidad: {item.cantidad}</p>
