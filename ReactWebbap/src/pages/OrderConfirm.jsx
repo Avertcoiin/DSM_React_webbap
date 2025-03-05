@@ -13,32 +13,63 @@ function OrderConfirm() {
       {cartItems.length === 0 ? (
         <p className="text-center">No tienes productos en tu carrito.</p>
       ) : (
-        <>
-          <div className="row">
-            {cartItems.map((item) => (
-              <div key={item.id} className="col-md-4">
-                <div className="card mb-3">
-                  <img
-                    src={item.archivo || "default_image_url"} // Usa la URL de la imagen del producto, si existe
-                    className="card-img-top"
-                    alt={item.nombre}
-                  />
-                  <div className="card-body">
-                    <h5 className="card-title">{item.nombre}</h5>
-                    <p className="card-text">€{item.precio}</p>
-                    <p className="card-text">Cantidad: {item.cantidad}</p>
+        <div className="row">
+          {/* Columna de la izquierda (productos) */}
+          <div className="col-md-8">
+            <div className="row">
+              {cartItems.map((item) => (
+                <div key={item.id} className="col-12 mb-4">
+                  <div className="card" style={{ display: 'flex', flexDirection: 'row', padding: '20px' }}>
+                    {/* Imagen del producto */}
+                    <div className="card-img-container" style={{ flex: 1 }}>
+                      <img
+                        src={item.archivo || "default_image_url"} // Usa la URL de la imagen del producto, si existe
+                        className="img-fluid"
+                        alt={item.nombre}
+                        style={{ maxHeight: '200px', objectFit: 'cover' }}
+                      />
+                    </div>
+
+                    {/* Contenido del producto */}
+                    <div className="card-body" style={{ flex: 2, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                      <h5 className="card-title">{item.nombre}</h5>
+                      <p className="card-text">€{item.precio}</p>
+                      <p className="card-text">Cantidad: {item.cantidad}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-          {/* Total del carrito */}
-          <div className="text-right">
-            <h4>Total: €{getTotalPrice().toFixed(2)}</h4>
+          {/* Columna de la derecha (resumen de pedido) */}
+          <div className="col-md-4">
+            <div className="card">
+              <div className="card-body">
+                <h5 className="card-title">Resumen de Pedido</h5>
+                <ul className="list-group">
+                  {cartItems.map((item) => (
+                    <li key={item.id} className="list-group-item d-flex justify-content-between">
+                      <span>{item.nombre}</span>
+                      <span>€{(item.precio * item.cantidad).toFixed(2)}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                {/* Total del carrito */}
+                <div className="mt-3 text-right">
+                  <h4>Total: €{getTotalPrice().toFixed(2)}</h4>
+                </div>
+              </div>
+            </div>
           </div>
-        </>
+        </div>
       )}
+
+      {/* Total Final */}
+      <div className="text-right mt-4">
+        <h3 className="fw-bold">Total del Pedido: €{getTotalPrice().toFixed(2)}</h3>
+      </div>
     </div>
   );
 }
