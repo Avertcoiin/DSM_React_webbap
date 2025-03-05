@@ -33,6 +33,23 @@ function ProductCarousel({ productos }) {
   const productChunks = chunkArray(productos, itemsPerRow);
 
   const handleIncrement = (id) => {
+    setCantidadProductos((prev) => {
+      const newCantidad = (prev[id] || 0) + 1;
+      console.log(`Producto ID: ${id}, Cantidad: ${newCantidad}, Precio total: €${(productos.find(p => p.id === id)?.precio * newCantidad).toFixed(2)}`);
+      return { ...prev, [id]: newCantidad };
+    });
+  };
+
+  const handleDecrement = (id) => {
+    setCantidadProductos((prev) => {
+      const newCantidad = Math.max((prev[id] || 0) - 1, 0);
+      console.log(`Producto ID: ${id}, Cantidad: ${newCantidad}, Precio total: €${(productos.find(p => p.id === id)?.precio * newCantidad).toFixed(2)}`);
+      return { ...prev, [id]: newCantidad };
+    });
+  };
+
+
+  /* const handleIncrement = (id) => {
     setCantidadProductos((prev) => ({
       ...prev,
       [id]: (prev[id] || 0) + 1,
@@ -44,7 +61,7 @@ function ProductCarousel({ productos }) {
       ...prev,
       [id]: Math.max((prev[id] || 0) - 1, 0),
     }));
-  };
+  }; */
 
   return (
     <div className="container">
