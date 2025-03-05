@@ -1,3 +1,4 @@
+// src/pages/OrderConfirm.jsx
 import React from 'react';
 import { useCart } from '../context/CartContext'; // Importamos el contexto del carrito
 
@@ -25,15 +26,19 @@ function OrderConfirm() {
                         src={item.archivo} // Usamos la propiedad archivo directamente para obtener la imagen
                         className="img-fluid" // Mantener la imagen fluida
                         alt={item.nombre}
-                        style={{ width: '35%', objectFit: 'cover' }} // Aquí cambiamos a 25% de su tamaño original
+                        style={{ width: '35%', objectFit: 'cover' }} // Cambiar tamaño de la imagen
                       />
                     </div>
 
                     {/* Contenido del producto */}
                     <div className="card-body d-flex flex-column justify-content-between" style={{ flex: 2 }}>
-                      <h5 className="card-title">{item.nombre}</h5>
-                      <p className="card-text">€{item.precio}</p>
-                      <p className="card-text">Cantidad: {item.cantidad}</p>
+                      <div className="d-flex justify-content-between align-items-center w-100">
+                        {/* Nombre del producto a la izquierda */}
+                        <h5 className="mb-0">{item.nombre}</h5>
+                        {/* Precio del producto a la derecha */}
+                        <p className="fw-bold fs-5 mb-0">{item.precio}€</p>
+                      </div>
+                      <p className="mb-0">Cantidad: {item.cantidad}</p>
                     </div>
                   </div>
                 </div>
@@ -50,14 +55,14 @@ function OrderConfirm() {
                   {cartItems.map((item) => (
                     <li key={item.id} className="list-group-item d-flex justify-content-between">
                       <span>{item.nombre}</span>
-                      <span>€{(item.precio * item.cantidad).toFixed(2)}</span>
+                      <span>{(item.precio * item.cantidad).toFixed(2)}€</span>
                     </li>
                   ))}
                 </ul>
 
                 {/* Total del carrito */}
                 <div className="mt-3 text-right">
-                  <h4>Total: €{getTotalPrice().toFixed(2)}</h4>
+                  <h4 className="fw-bold">Total: {getTotalPrice().toFixed(2)}€</h4>
                 </div>
               </div>
             </div>
@@ -67,7 +72,7 @@ function OrderConfirm() {
 
       {/* Total Final */}
       <div className="text-right mt-4">
-        <h3 className="fw-bold">Total del Pedido: €{getTotalPrice().toFixed(2)}</h3>
+        <h3 className="fw-bold">Total del Pedido: {getTotalPrice().toFixed(2)}€</h3>
       </div>
     </div>
   );
