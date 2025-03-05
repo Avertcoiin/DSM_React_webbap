@@ -26,13 +26,18 @@ function Header() {
       </div>
       <div className="d-flex align-items-center">
         <div className="cart mx-3">
-          <img src={carrito} alt="Carrito" style={{ height: "50px" }} />
+          <img src={carrito} alt="Carrito" style={{ height: "30px" }} />
+          <span className="cart-count" style={{ color: "white" }}>
+            {totalCantidad} {/* Muestra la cantidad total de productos */}
+          </span>
         </div>
         <div className="total mx-3 text-light">
-          <span>Total: $0.00</span>
+          <span>Total: {totalPrecio.toFixed(2)}€</span> {/* Muestra el total en precio */}
         </div>
-        <div className="order-button mx-3">
-          <button className="btn btn-success">Realizar Pedido</button>
+        <div className="session-order mx-3">
+          <button className="btn btn-success" onClick={handleOrderClick}>
+            Realizar Pedido
+          </button>
         </div>
         <div className="session-order mx-3">
           <button className="btn btn-primary">Sesión/Pedido</button>
