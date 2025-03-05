@@ -42,8 +42,6 @@ function ProductCarousel({ productos }) {
       const newCantidad = (prev[id] || 0) + 1; // Calculamos la nueva cantidad
       const product = productos.find(p => p.id === id);
 
-      console.log(`Incrementando ${product.nombre}, Cantidad: ${newCantidad}`);
-
       // Actualizamos el carrito con la cantidad del estado `cantidadProductos`
       addToCart({
         id: product.id,
@@ -62,8 +60,6 @@ function ProductCarousel({ productos }) {
     setCantidadProductos((prev) => {
       const newCantidad = Math.max((prev[id] || 0) - 1, 0); // Calculamos la nueva cantidad
       const product = productos.find(p => p.id === id);
-
-      console.log(`Decrementando ${product.nombre}, Cantidad: ${newCantidad}`);
 
       // Actualizamos el carrito con la cantidad del estado `cantidadProductos`
       addToCart({
