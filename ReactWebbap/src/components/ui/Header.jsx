@@ -1,12 +1,13 @@
 // src/components/ui/Header.jsx
 import React from "react";
-import { useNavigate } from "react-router-dom"; // Importa el hook useNavigate
+import { useNavigate, useLocation } from "react-router-dom"; // Importa el hook useNavigate
 import logo from "../../assets/logo.png"; // Asegúrate de que la ruta al logo sea correcta
 import carrito from "../../assets/carrito.jpg"; // Asegúrate de que la ruta al carrito sea correcta
 import { useCart } from "../../context/CartContext"; // Importa el hook del carrito
 
 function Header() {
   const navigate = useNavigate(); // Usamos el hook useNavigate para redirigir
+  const location = useLocation(); // Usamos el hook useLocation para obtener la ruta actual
   const { cartItems, getTotalPrice } = useCart(); // Accede a los productos en el carrito y la función para obtener el total
 
   // Calculamos el total de productos y el precio total
@@ -15,7 +16,11 @@ function Header() {
 
   // Función para manejar el clic en "Sesión/Pedido"
   const handleOrderClick = () => {
-    navigate("/order-confirm"); // Redirige al usuario a la página de confirmación de pedido
+    if (location.pathname === "/order-confirm") {
+      navigate(-1); // Navega hacia atrás en el historial
+    } else {
+      navigate("/order-confirm"); // Redirige al usuario a la página de confirmación de pedido
+    }
   };
 
   return (
@@ -36,7 +41,7 @@ function Header() {
         </div>
         <div className="session-order mx-3">
           <button className="btn btn-success" onClick={handleOrderClick}>
-            Realizar Pedido
+            {location.pathname === "/order-confirm" ? "Atrás" : "Realizar Pedido"}
           </button>
         </div>
         <div className="session-order mx-3">
