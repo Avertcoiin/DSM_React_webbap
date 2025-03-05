@@ -8,6 +8,7 @@ export const useCart = () => {
   return useContext(CartContext);
 };
 
+// Crea el CartProvider. Este componente proveerá el estado y las funciones para el carrito
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]); // Estado del carrito
 
@@ -38,7 +39,7 @@ export const CartProvider = ({ children }) => {
     return cartItems.reduce((total, item) => total + item.precio * item.cantidad, 0);
   };
 
-  // Asegúrate de que el return esté dentro del CartProvider
+  
   return (
     <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, getTotalPrice }}>
       {children}
