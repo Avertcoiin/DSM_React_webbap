@@ -26,7 +26,7 @@ function Header() {
       </div>
       <div className="d-flex align-items-center">
         <div className="cart mx-3">
-          <img src={carrito} alt="Carrito" style={{ height: "30px" }} />
+          <img src={carrito} alt="Carrito" style={{ height: "40px" }} />
           <span className="cart-count" style={{ color: "white" }}>
             {totalCantidad} {/* Muestra la cantidad total de productos */}
           </span>
