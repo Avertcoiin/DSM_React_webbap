@@ -4,14 +4,14 @@ import carrito from "../../assets/carrito.jpg"; // Asegúrate de que la ruta al 
 
 function Header() {
   return (
-    <header className="d-flex align-items-center justify-content-between p-3 bg-dark" style={{ backgroundColor: "#333" }}>
+    <header className="d-flex align-items-center justify-content-between p-3 bg-#333333" style={{ backgroundColor: "#333" }}>
       <div className="d-flex align-items-center">
         <img src={logo} alt="Logo" className="logo" style={{ height: "50px" }} />
         <input type="text" placeholder="Buscar..." className="form-control mx-3" style={{ maxWidth: "300px" }} />
       </div>
       <div className="d-flex align-items-center">
         <div className="cart mx-3">
-          <img src={carrito} alt="Carrito" style={{ height: "30px" }} />
+          <img src={carrito} alt="Carrito" style={{ height: "50px" }} />
         </div>
         <div className="total mx-3 text-light">
           <span>Total: $0.00</span>
