@@ -1,47 +1,45 @@
 // src/context/CartContext.jsx
+import React, { createContext, useContext, useState } from "react";
 
-import React, { createContext, useContext, useState } from 'react'
+// Crea el contexto del carrito
+const CartContext = createContext();
 
-// Creamos el contexto para el carrito
-const CartContext = createContext()
+export const useCart = () => {
+  return useContext(CartContext);
+};
 
-// Proveedor del contexto
-export const useCart = () => useContext(CartContext)
+export const CartProvider = ({ children }) => {
+  const [cartItems, setCartItems] = useState([]); // Estado del carrito
 
-// El proveedor envuelve la aplicación y gestiona el estado global del carrito
-const CartContextProvider = ({ children }) => {
-  const [cart, setCart] = useState([])
-
-  // Función para agregar al carrito
+  // Función para añadir productos al carrito
   const addToCart = (product) => {
-    const updatedCart = [...cart]
-    const existingProduct = updatedCart.find(item => item.id === product.id)
+    setCartItems((prevItems) => {
+      const existingProduct = prevItems.find(item => item.id === product.id);
+      if (existingProduct) {
+        return prevItems.map(item =>
+          item.id === product.id
+            ? { ...item, cantidad: item.cantidad + product.cantidad }
+            : item
+        );
+      }
+      return [...prevItems, product];
+    });
+  };
 
-    if (existingProduct) {
-      existingProduct.cantidad += 1  // Aumentar cantidad si el producto ya está en el carrito
-    } else {
-      updatedCart.push({ ...product, cantidad: 1 }) // Si no está en el carrito, agregarlo con cantidad 1
-    }
+  // Función para eliminar productos del carrito
+  const removeFromCart = (productId) => {
+    setCartItems((prevItems) => prevItems.filter(item => item.id !== productId));
+  };
 
-    setCart(updatedCart)
-  }
-
-  // Función para eliminar del carrito
-  const removeFromCart = (id) => {
-    const updatedCart = cart.filter(item => item.id !== id)
-    setCart(updatedCart)
-  }
-
-  // Calcular el total
-  const getTotal = () => {
-    return cart.reduce((total, product) => total + product.precio * product.cantidad, 0)
-  }
+  // Función para obtener el precio total del carrito
+  const getTotalPrice = () => {
+    return cartItems.reduce((total, item) => total + item.precio * item.cantidad, 0);
+  };
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, getTotal }}>
+    <CartContext.Provider value={{ cartItems, addToCart, removeFromCart, getTotalPrice }}>
       {children}
     </CartContext.Provider>
-  )
-}
+  );
+};
 
-export default CartContextProvider

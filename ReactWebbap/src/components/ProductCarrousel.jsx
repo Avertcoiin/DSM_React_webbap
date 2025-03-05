@@ -1,26 +1,30 @@
-// src/components/ProductCarousel.jsx
-import React, { useState, useEffect } from 'react';
+// src/components/ProductCarrousel.jsx
+import React, { useState, useEffect, useCallback } from 'react';
+import { useCart } from '../context/CartContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 
 function ProductCarousel({ productos }) {
+  const { addToCart, cartItems, getTotalPrice } = useCart(); // Accedemos al método getTotalPrice del contexto
   const [activeIndex] = useState(0);
   const [itemsPerRow, setItemsPerRow] = useState(getItemsPerRow());
   const [cantidadProductos, setCantidadProductos] = useState({});
 
-  function getItemsPerRow() { // Definimos número de elementos necesarios
+  // Función para actualizar la cantidad de productos por fila
+  useEffect(() => {
+    const handleResize = () => setItemsPerRow(getItemsPerRow());
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Función para determinar la cantidad de productos por fila
+  function getItemsPerRow() {
     const width = window.innerWidth;
     if (width >= 1200) return 4;
     if (width >= 992) return 3;
     if (width >= 768) return 2;
     return 1;
   }
-
-  useEffect(() => {
-    const handleResize = () => setItemsPerRow(getItemsPerRow());
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   const chunkArray = (array, size) => {
     const result = [];
@@ -32,7 +36,47 @@ function ProductCarousel({ productos }) {
 
   const productChunks = chunkArray(productos, itemsPerRow);
 
-  const handleIncrement = (id) => {
+  // handleIncrement para aumentar la cantidad del producto
+  const handleIncrement = useCallback((id) => {
+    setCantidadProductos((prev) => {
+      const newCantidad = (prev[id] || 0) + 1;
+      const product = productos.find(p => p.id === id);
+
+      console.log(`Incrementando ${product.nombre}, Cantidad: ${newCantidad}`);
+
+      // Actualizar carrito solo después de cambiar la cantidad
+      addToCart({
+        id: product.id,
+        nombre: product.nombre,
+        precio: product.precio,
+        cantidad: newCantidad,
+      });
+
+      return { ...prev, [id]: newCantidad };
+    });
+  }, [productos, addToCart]);
+
+  // handleDecrement para disminuir la cantidad del producto
+  const handleDecrement = useCallback((id) => {
+    setCantidadProductos((prev) => {
+      const newCantidad = Math.max((prev[id] || 0) - 1, 0);
+      const product = productos.find(p => p.id === id);
+
+      console.log(`Decrementando ${product.nombre}, Cantidad: ${newCantidad}`);
+
+      // Actualizar carrito solo después de cambiar la cantidad
+      addToCart({
+        id: product.id,
+        nombre: product.nombre,
+        precio: product.precio,
+        cantidad: newCantidad,
+      });
+
+      return { ...prev, [id]: newCantidad };
+    });
+  }, [productos, addToCart]);
+
+  /* const handleIncrement = (id) => {
     setCantidadProductos((prev) => {
       const newCantidad = (prev[id] || 0) + 1;
       console.log(`Producto ID: ${id}, Cantidad: ${newCantidad}, Precio total: €${(productos.find(p => p.id === id)?.precio * newCantidad).toFixed(2)}`);
@@ -46,21 +90,6 @@ function ProductCarousel({ productos }) {
       console.log(`Producto ID: ${id}, Cantidad: ${newCantidad}, Precio total: €${(productos.find(p => p.id === id)?.precio * newCantidad).toFixed(2)}`);
       return { ...prev, [id]: newCantidad };
     });
-  };
-
-
-  /* const handleIncrement = (id) => {
-    setCantidadProductos((prev) => ({
-      ...prev,
-      [id]: (prev[id] || 0) + 1,
-    }));
-  };
-
-  const handleDecrement = (id) => {
-    setCantidadProductos((prev) => ({
-      ...prev,
-      [id]: Math.max((prev[id] || 0) - 1, 0),
-    }));
   }; */
 
   return (
