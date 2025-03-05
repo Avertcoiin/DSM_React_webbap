@@ -1,33 +1,46 @@
 // src/pages/OrderConfirm.jsx
+import React from 'react';
+import { useCart } from '../context/CartContext'; // Importamos el contexto del carrito
 
-import { useCart } from "../context/CartContext";
-import { Link } from "react-router-dom";
-
-const OrderConfirm = () => {
-  const { cart, getTotal } = useCart();
+function OrderConfirm() {
+  const { cartItems, getTotalPrice } = useCart(); // Obtenemos los productos del carrito y el precio total
 
   return (
-    <div className="order-confirmation">
-      <h2>Confirmación del pedido</h2>
-      <div className="order-details">
-        {cart.length === 0 ? (
-          <p>No hay productos en tu carrito.</p>
-        ) : (
-          cart.map((product) => (
-            <div key={product.id}>
-              <h3>{product.nombre}</h3>
-              <p>Cantidad: {product.cantidad}</p>
-              <p>Precio: {product.precio}€</p>
-            </div>
-          ))
-        )}
-      </div>
-      <h3>Total: {getTotal()}€</h3>
-      <Link to="/thank-you">
-        <button>CONTINUAR</button>
-      </Link>
+    <div className="container my-5">
+      <h2 className="text-center mb-4">Confirmación de Pedido</h2>
+
+      {/* Si el carrito está vacío */}
+      {cartItems.length === 0 ? (
+        <p className="text-center">No tienes productos en tu carrito.</p>
+      ) : (
+        <>
+          <div className="row">
+            {cartItems.map((item) => (
+              <div key={item.id} className="col-md-4">
+                <div className="card mb-3">
+                  <img
+                    src={item.archivo || "default_image_url"} // Usa la URL de la imagen del producto, si existe
+                    className="card-img-top"
+                    alt={item.nombre}
+                  />
+                  <div className="card-body">
+                    <h5 className="card-title">{item.nombre}</h5>
+                    <p className="card-text">€{item.precio}</p>
+                    <p className="card-text">Cantidad: {item.cantidad}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Total del carrito */}
+          <div className="text-right">
+            <h4>Total: €{getTotalPrice().toFixed(2)}</h4>
+          </div>
+        </>
+      )}
     </div>
   );
-};
+}
 
 export default OrderConfirm;

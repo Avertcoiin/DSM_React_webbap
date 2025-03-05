@@ -2,15 +2,17 @@ import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home'; // Página principal
 import Footer from './components/ui/Footer';
 import Header from './components/ui/Header';
+import OrderConfirm from './pages/OrderConfirm'; // Importa la nueva página de confirmación
 import { CartProvider } from './context/CartContext'; // Importa el CartProvider
 
 function App() {
   return (
     <CartProvider>
       <div>
-        <Header/>
+        <Header />
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/order-confirm" element={<OrderConfirm />} /> {/* Ruta para OrderConfirm */}
         </Routes>
         <Footer />
       </div>
