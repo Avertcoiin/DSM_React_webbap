@@ -1,9 +1,14 @@
 // src/pages/OrderConfirm.jsx
 import React from 'react';
 import { useCart } from '../context/CartContext'; // Importamos el contexto del carrito
+import { useNavigate } from "react-router-dom";
 
 function OrderConfirm() {
   const { cartItems, getTotalPrice, clearCart } = useCart(); // Obtenemos los productos del carrito, el precio total y la función para borrar
+  const navigate = useNavigate();
+  const continuarPedido = () => {
+    navigate("/formulario"); // Redirige al usuario a la página de confirmación de pedido
+  };
 
   return (
     <div className="container my-5">
@@ -67,7 +72,7 @@ function OrderConfirm() {
 
                 {/* Botones de acción */}
                 <div className="d-flex flex-column mt-3">
-                  <button className="btn btn-success btn-lg mb-2">CONTINUAR</button>
+                  <button className="btn btn-success btn-lg mb-2" onClick={continuarPedido}>CONTINUAR</button>
                   <button className="btn btn-danger btn-lg" onClick={clearCart}>BORRAR PEDIDO</button>
                 </div>
               </div>
