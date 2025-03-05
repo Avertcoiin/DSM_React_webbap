@@ -1,5 +1,4 @@
 // src/pages/Home.jsx
-// src/pages/Home.jsx
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import ProductCarousel from '../components/ProductCarrousel';// Importa el componente
