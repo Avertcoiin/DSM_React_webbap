@@ -1,7 +1,6 @@
 import React from 'react';
 import { useCart } from '../context/CartContext'; // Importamos el contexto del carrito
 import { useNavigate } from "react-router-dom";
-import { db } from '../firebase_conf/firebase';
 
 function OrderConfirm() {
   const { cartItems, getTotalPrice, clearCart } = useCart(); // Obtenemos los productos del carrito, el precio total y la función para borrar
