@@ -16,7 +16,13 @@ function OrderConfirm() {
 
       {/* Si el carrito está vacío */}
       {cartItems.length === 0 ? (
-        <p className="text-center">No tienes productos en tu carrito.</p>
+        <div className="d-flex flex-column align-items-center">
+          <p className="text-center">No tienes productos en tu carrito.</p>
+          <button type="button" className="btn btn-secondary btn-lg" onClick={() => navigate(-1)}>
+            Atrás
+          </button>
+        </div>
+
       ) : (
         <div className="row">
           {/* Columna de la izquierda (productos) */}
