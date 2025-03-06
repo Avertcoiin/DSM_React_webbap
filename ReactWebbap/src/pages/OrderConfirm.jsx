@@ -1,4 +1,3 @@
-// src/pages/OrderConfirm.jsx
 import React from 'react';
 import { useCart } from '../context/CartContext'; // Importamos el contexto del carrito
 import { useNavigate } from "react-router-dom";
@@ -50,6 +49,15 @@ function OrderConfirm() {
                         <p className="fw-bold fs-5 mb-0">{item.precio}€</p>
                       </div>
                       <p className="mb-0">Cantidad: {item.cantidad}</p>
+
+                      {/* Unidades disponibles (uds) */}
+                      <div className="d-flex justify-content-between mt-2">
+                        <span>
+                          {item.uds <= 10 
+                            ? <span className="text-danger">Solo quedan {item.uds} unidades</span> 
+                            : <span className="text-success">En stock</span>}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </div>
