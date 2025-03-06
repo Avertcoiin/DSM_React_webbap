@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; // Para la navegación
+import {db} from '../firebase'; // Importa la instancia de la base de datos
 
 function OrderForm() {
     const navigate = useNavigate(); // Hook para manejar la navegación
