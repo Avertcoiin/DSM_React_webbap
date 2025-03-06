@@ -16,7 +16,7 @@ function Header() {
 
   // Función para manejar el clic en "Sesión/Pedido"
   const handleOrderClick = () => {
-    if (location.pathname === "/order-confirm") {
+    if (location.pathname !== "/") {
       navigate(-1); // Navega hacia atrás en el historial
     } else {
       navigate("/order-confirm"); // Redirige al usuario a la página de confirmación de pedido
@@ -24,7 +24,7 @@ function Header() {
   };
 
   return (
-    <header className="d-flex align-items-center justify-content-between p-3 bg-#333333" style={{ backgroundColor: "#333" }}>
+    <header className="d-flex align-items-center justify-content-between p-3 bg-#333333 fixed-top" style={{ backgroundColor: "#333" }}>
       <div className="d-flex align-items-center">
         <img src={logo} alt="Logo" className="logo" style={{ height: "50px" }} />
         <input type="text" placeholder="Buscar..." className="form-control mx-3" style={{ maxWidth: "300px" }} />
@@ -36,12 +36,13 @@ function Header() {
             {totalCantidad}
           </span>
         </div>
+
         <div className="total mx-3 text-light">
           <span>Total: {totalPrecio.toFixed(2)}€</span> {/* Muestra el total en precio */}
         </div>
         <div className="session-order mx-3">
           <button className="btn btn-success" onClick={handleOrderClick}>
-            {location.pathname === "/order-confirm" ? "Atrás" : "Realizar Pedido"}
+            {location.pathname !== "/" ? "Atrás" : "Realizar Pedido"}
           </button>
         </div>
         <div className="session-order mx-3">

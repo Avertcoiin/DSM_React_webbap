@@ -11,14 +11,16 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 function App() {
   return (
     <CartProvider>
-      <div>
+      <div className='d-flex flex-column min-vh-100'>
         <Header />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/order-confirm" element={<OrderConfirm />} /> {/* Ruta para OrderConfirm */}
-          <Route path="/formulario" element={<Formulario />} />
-          <Route path="/thank-you" element={<ThankYou />} />
-        </Routes>
+        <div className = "flex-grow-1">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/order-confirm" element={<OrderConfirm />} /> {/* Ruta para OrderConfirm */}
+            <Route path="/formulario" element={<Formulario />} />
+            <Route path="/thank-you" element={<ThankYou />} />
+          </Routes>
+        </div>
         <Footer />
       </div>
     </CartProvider>
