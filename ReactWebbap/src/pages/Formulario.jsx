@@ -6,7 +6,7 @@ import { ref, set, push } from 'firebase/database'; // Importa las funciones nec
 
 function OrderForm() {
     const navigate = useNavigate(); // Hook para manejar la navegación
-    const { cartItems, getTotalPrice } = useCart();
+    const { cartItems, getTotalPrice, clearCart } = useCart();
     const [formData, setFormData] = useState({
         nombre: '',
         apellidos: '',
@@ -50,10 +50,16 @@ function OrderForm() {
         // Subir la orden a Firebase
         const orderRef = ref(db, 'orders'); // Define el path donde se almacenarán los datos
         const newOrderRef = push(orderRef); // Crea una nueva referencia única para la orden
-        set(newOrderRef, orderData); // Sube los datos de la orden a Firebase
-
-        // Redirige al usuario a la página de agradecimiento
-        navigate('/thank-you');
+        set(newOrderRef, orderData) // Sube los datos de la orden a Firebase
+            .then(() => {
+                // Si la subida fue exitosa, vaciar el carrito
+                clearCart(); // Borra el carrito
+                navigate('/thank-you'); // Redirige al usuario a la página de agradecimiento
+            })
+            .catch((error) => {
+                // Manejar errores, si ocurren
+                console.error("Error al subir la orden: ", error);
+            });
     };
 
 
