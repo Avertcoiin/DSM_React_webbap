@@ -30,12 +30,13 @@ function Header() {
         <input type="text" placeholder="Buscar..." className="form-control mx-3" style={{ maxWidth: "300px" }} />
       </div>
       <div className="d-flex align-items-center">
-        <div className="cart mx-3">
+        <div className="cart mx-3 position-relative">
           <img src={carrito} alt="Carrito" style={{ height: "40px" }} />
-          <span className="cart-count" style={{ color: "white" }}>
-            {totalCantidad} {/* Muestra la cantidad total de productos */}
+          <span className="badge rounded-circle bg-white text-dark fw-bold position-absolute top-0 start-100 translate-middle border border-dark">
+            {totalCantidad}
           </span>
         </div>
+
         <div className="total mx-3 text-light">
           <span>Total: {totalPrecio.toFixed(2)}€</span> {/* Muestra el total en precio */}
         </div>
