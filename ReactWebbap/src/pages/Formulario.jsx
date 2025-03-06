@@ -1,11 +1,12 @@
-// src/pages/OrderConfirm.jsx
-
 import React, { useState } from 'react';
+import { useCart } from '../context/CartContext'; // Asegúrate de que esta importación esté correcta
 import { useNavigate } from 'react-router-dom'; // Para la navegación
-import {db} from '../firebase'; // Importa la instancia de la base de datos
+import { db } from '../firebase'; // Importa la instancia de la base de datos
+import { ref, set, push } from 'firebase/database'; // Importa las funciones necesarias de Firebase
 
 function OrderForm() {
     const navigate = useNavigate(); // Hook para manejar la navegación
+    const { cartItems, getTotalPrice } = useCart();
     const [formData, setFormData] = useState({
         nombre: '',
         apellidos: '',
@@ -22,11 +23,39 @@ function OrderForm() {
 
     const handleSubmit = (e) => {
         e.preventDefault(); // Evita el comportamiento predeterminado del formulario
-        console.log('Datos enviados:', formData);
+
+        // Eliminar los datos sensibles antes de subir a Firebase
+        const { tarjeta, cvv, ...formDataWithoutSensitive } = formData;
+
+        // Obtener los detalles de la compra
+        const itemsDetails = cartItems.map(item => ({
+            id: item.id,
+            cantidad: item.cantidad,
+            precio: item.precio,
+            nombre: item.nombre
+        }));
+
+        // Calcular el tiempo de envío máximo
+        const maxTiempoEnvio = Math.max(...cartItems.map(item => item.tiempoEnv));
+
+        // Crear el objeto de la orden
+        const orderData = {
+            ...formDataWithoutSensitive,
+            items: itemsDetails, // Productos comprados
+            totalPrice: getTotalPrice(), // Precio total de la compra
+            tiempoEnvio: maxTiempoEnvio, // Tiempo máximo de entrega
+            timestamp: new Date().toISOString(), // Fecha de la compra
+        };
+
+        // Subir la orden a Firebase
+        const orderRef = ref(db, 'orders'); // Define el path donde se almacenarán los datos
+        const newOrderRef = push(orderRef); // Crea una nueva referencia única para la orden
+        set(newOrderRef, orderData); // Sube los datos de la orden a Firebase
 
         // Redirige al usuario a la página de agradecimiento
         navigate('/thank-you');
     };
+
 
     return (
         <div className="container my-5">
