@@ -1,0 +1,3 @@
+COSAS PENDIENTES:
+
+  - Cuando le doy a realizar pedido si le doy a atrás me guarda los datos del contexto pero no los muestra en las unidades disponibles del Home.
