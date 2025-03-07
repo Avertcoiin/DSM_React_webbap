@@ -1,33 +1,33 @@
 // src/components/ui/Header.jsx
-import React from "react";
-import { useNavigate, useLocation } from "react-router-dom"; // Importa el hook useNavigate
-import logo from "../../assets/logo.png"; // Asegúrate de que la ruta al logo sea correcta
-import carrito from "../../assets/carrito.jpg"; // Asegúrate de que la ruta al carrito sea correcta
-import { useCart } from "../../context/CartContext"; // Importa el hook del carrito
-import { useState } from "react";
+import React, { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom"; 
+import logo from "../../assets/logo.png"; 
+import carrito from "../../assets/carrito.jpg"; 
+import { useCart } from "../../context/CartContext"; 
+import { useSearch } from "../../context/SearchContext"; // Usamos el hook del contexto de búsqueda
 
 function Header() {
-  const navigate = useNavigate(); // Usamos el hook useNavigate para redirigir
-  const location = useLocation(); // Usamos el hook useLocation para obtener la ruta actual
-  const { cartItems, getTotalPrice } = useCart(); // Accede a los productos en el carrito y la función para obtener el total
-  const [searchQuery, setSearchQuery] = useState(""); // Estado para guardar la búsqueda
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { cartItems, getTotalPrice } = useCart();
+  const { searchTerm, setSearchTerm } = useSearch(); // Usamos el término de búsqueda desde el contexto
 
-  // Manejar el cambio en el input
+  const [searchQuery, setSearchQuery] = useState(searchTerm);
+
+  // Manejar el cambio en el input de búsqueda
   const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value); // Actualizamos el estado de búsqueda
-    setSearchTerm(event.target.value); // Pasamos el término de búsqueda al componente padre
+    setSearchQuery(event.target.value); 
+    setSearchTerm(event.target.value); // Actualizamos el término de búsqueda en el contexto
   };
 
-  // Calculamos el total de productos y el precio total
-  const totalCantidad = cartItems.reduce((acc, item) => acc + item.cantidad, 0); // Suma la cantidad total
-  const totalPrecio = getTotalPrice(); // Usamos el cálculo del precio total desde el contexto
+  const totalCantidad = cartItems.reduce((acc, item) => acc + item.cantidad, 0); 
+  const totalPrecio = getTotalPrice(); 
 
-  // Función para manejar el clic en "Sesión/Pedido"
   const handleOrderClick = () => {
     if (location.pathname !== "/") {
-      navigate(-1); // Navega hacia atrás en el historial
+      navigate(-1); 
     } else {
-      navigate("/order-confirm"); // Redirige al usuario a la página de confirmación de pedido
+      navigate("/order-confirm"); 
     }
   };
 
