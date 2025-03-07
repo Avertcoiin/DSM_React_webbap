@@ -15,6 +15,11 @@ export const CartProvider = ({ children }) => {
   // Función para agregar al carrito
   const addToCart = (product) => {
     setCartItems((prevItems) => {
+      if (product.cantidad === 0) {
+        // Si la cantidad es 0, eliminamos el producto del carrito
+        return prevItems.filter(item => item.id !== product.id);
+      }
+  
       const existingProduct = prevItems.find(item => item.id === product.id);
       if (existingProduct) {
         // Si el producto ya existe, actualiza la cantidad
@@ -28,6 +33,7 @@ export const CartProvider = ({ children }) => {
       return [...prevItems, product];
     });
   };
+  
 
   // Función para eliminar del carrito
   const removeFromCart = (productId) => {

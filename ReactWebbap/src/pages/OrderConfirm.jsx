@@ -1,3 +1,4 @@
+// src/pages/OrderConfirm.jsx
 import React from 'react';
 import { useCart } from '../context/CartContext'; // Importamos el contexto del carrito
 import { useNavigate } from "react-router-dom";
@@ -5,6 +6,29 @@ import { useNavigate } from "react-router-dom";
 function OrderConfirm() {
   const { cartItems, getTotalPrice, clearCart } = useCart(); // Obtenemos los productos del carrito, el precio total y la función para borrar
   const navigate = useNavigate();
+
+  // Función para obtener el tiempo estimado de envío
+  const getEstimatedShippingTime = () => {
+    const maxShippingTime = Math.max(...cartItems.map(item => item.tiempoEnv));
+    return maxShippingTime;
+  };
+
+  // Función para calcular la fecha estimada de entrega
+  const getEstimatedDeliveryDate = () => {
+    const estimatedShippingTime = getEstimatedShippingTime(); // Obtener el tiempo estimado
+    const today = new Date(); // Obtener la fecha actual
+    today.setDate(today.getDate() + estimatedShippingTime); // Sumamos los días de envío a la fecha actual
+
+    // Obtener el día y el mes
+    const day = today.getDate();
+    const month = today.toLocaleString('default', { month: 'long' }); // Obtener el nombre del mes
+
+    return `${day} de ${month}`; // Devolver la fecha en el formato "15 de marzo"
+  };
+
+  // Filtrar los productos con cantidad mayor a 0
+  const filteredCartItems = cartItems.filter(item => item.cantidad > 0);
+
   const continuarPedido = () => {
     navigate("/formulario"); // Redirige al usuario a la página de confirmación de pedido
   };
@@ -14,20 +38,19 @@ function OrderConfirm() {
       <h2 className="text-center mb-4">Confirmación de Pedido</h2>
 
       {/* Si el carrito está vacío */}
-      {cartItems.length === 0 ? (
+      {filteredCartItems.length === 0 ? (
         <div className="d-flex flex-column align-items-center">
           <p className="text-center">No tienes productos en tu carrito.</p>
           <button type="button" className="btn btn-secondary btn-lg" onClick={() => navigate(-1)}>
             Atrás
           </button>
         </div>
-
       ) : (
         <div className="row">
           {/* Columna de la izquierda (productos) */}
           <div className="col-md-8">
             <div className="row">
-              {cartItems.map((item) => (
+              {filteredCartItems.map((item) => (
                 <div key={item.id} className="col-12 mb-4">
                   <div className="card d-flex flex-row p-3">
                     {/* Imagen del producto */}
@@ -53,8 +76,8 @@ function OrderConfirm() {
                       {/* Unidades disponibles (uds) */}
                       <div className="d-flex justify-content-between mt-2">
                         <span>
-                          {item.uds <= 10 
-                            ? <span className="text-danger">Solo quedan {item.uds} unidades</span> 
+                          {item.uds <= 10
+                            ? <span className="text-danger">Solo quedan {item.uds} unidades</span>
                             : <span className="text-success">En stock</span>}
                         </span>
                       </div>
@@ -82,6 +105,13 @@ function OrderConfirm() {
                 {/* Total del carrito */}
                 <div className="mt-3 text-right">
                   <h4 className="fw-bold">Total: {getTotalPrice().toFixed(2)}€</h4>
+                </div>
+
+                {/* Mostrar la fecha estimada de entrega */}
+                <div className="mt-3">
+                  <p className="fst-italic fs-6">
+                    Tu pedido llegará el {getEstimatedDeliveryDate()}.
+                  </p>
                 </div>
 
                 {/* Botones de acción */}
