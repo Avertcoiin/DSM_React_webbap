@@ -4,6 +4,7 @@ COSAS PENDIENTES:
   - Arreglar que el Header se coma los títulos de las páginas.
   - Que no se pierda la info del formulario si voy atrás.
   - Hacer que cuando se compre algo reduzca las unidades.
+  - Añadir límite de compra según unidades restantes.
 
 ESPECIFICACIONES QUE FALTAN POR HACER:
 Un menú superior nos dará opción de acceder a la página principal de realización de
