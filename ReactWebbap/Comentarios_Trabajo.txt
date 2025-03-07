@@ -13,3 +13,5 @@ pantalla mostrará un listado de los pedidos, que se podrán pulsar para ver la 
 completa del mismo con información del solicitante.
 
 Desplegar el proyecto una vez acabado.
+
+Hacer login.
