@@ -38,11 +38,15 @@ function ProductCarousel({ productos }) {
 
   // handleIncrement para aumentar la cantidad del producto
   const handleIncrement = useCallback((id) => {
+    // Encontramos el producto en el carrito
+    const cartProduct = cartItems.find(item => item.id === id);
+    const currentQuantity = cartProduct ? cartProduct.cantidad : 0; // Si existe en el carrito, usamos su cantidad
+  
+    // Incrementamos la cantidad
     setCantidadProductos((prev) => {
-      const newCantidad = (prev[id] || 0) + 1; // Calculamos la nueva cantidad
+      const newCantidad = currentQuantity + 1;
       const product = productos.find(p => p.id === id);
-
-      // Actualizamos el carrito con la cantidad del estado `cantidadProductos`
+  
       addToCart({
         id: product.id,
         nombre: product.nombre,
@@ -52,18 +56,22 @@ function ProductCarousel({ productos }) {
         tiempoEnv: product.tiempoEnv,
         uds: product.uds,
       });
-
-      return { ...prev, [id]: newCantidad }; // Actualizamos el estado `cantidadProductos`
+  
+      return { ...prev, [id]: newCantidad };
     });
-  }, [productos, addToCart]);
-
+  }, [productos, addToCart, cartItems]);
+  
   // handleDecrement para disminuir la cantidad del producto
   const handleDecrement = useCallback((id) => {
+    // Encontramos el producto en el carrito
+    const cartProduct = cartItems.find(item => item.id === id);
+    const currentQuantity = cartProduct ? cartProduct.cantidad : 0; // Si existe en el carrito, usamos su cantidad
+  
+    // Decrementamos la cantidad, pero no permitimos valores negativos
     setCantidadProductos((prev) => {
-      const newCantidad = Math.max((prev[id] || 0) - 1, 0); // Calculamos la nueva cantidad
+      const newCantidad = Math.max(currentQuantity - 1, 0); // Si ya está en 0, no decrementar más
       const product = productos.find(p => p.id === id);
-
-      // Actualizamos el carrito con la cantidad del estado `cantidadProductos`
+  
       addToCart({
         id: product.id,
         nombre: product.nombre,
@@ -73,10 +81,11 @@ function ProductCarousel({ productos }) {
         tiempoEnv: product.tiempoEnv,
         uds: product.uds,
       });
-
-      return { ...prev, [id]: newCantidad }; // Actualizamos el estado `cantidadProductos`
+  
+      return { ...prev, [id]: newCantidad };
     });
-  }, [productos, addToCart]);
+  }, [productos, addToCart, cartItems]);
+  
 
   return (
     <div className="container">
