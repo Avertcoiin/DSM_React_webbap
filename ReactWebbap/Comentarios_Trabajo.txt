@@ -4,3 +4,4 @@ COSAS PENDIENTES:
   - Asegurarse de que si el usuario navega manualmente no pueda ir a páginas que no debería. Que el usuario tenga que tener productos para poder hacer un pedido, que solo pueda acceder a sus pedidos etc.
   - Añadir tiempo estimado de la entrega ya que es solo coger el mayor valor de la BBDD.
   - Borrar todo lo del context una vez hecho el pedido. Esto intentaré hacerlo cuando esté en la BBDD.
+  - Arreglar que el Header se coma los títulos de las páginas.
