@@ -4,11 +4,19 @@ import { useNavigate, useLocation } from "react-router-dom"; // Importa el hook 
 import logo from "../../assets/logo.png"; // Asegúrate de que la ruta al logo sea correcta
 import carrito from "../../assets/carrito.jpg"; // Asegúrate de que la ruta al carrito sea correcta
 import { useCart } from "../../context/CartContext"; // Importa el hook del carrito
+import { useState } from "react";
 
 function Header() {
   const navigate = useNavigate(); // Usamos el hook useNavigate para redirigir
   const location = useLocation(); // Usamos el hook useLocation para obtener la ruta actual
   const { cartItems, getTotalPrice } = useCart(); // Accede a los productos en el carrito y la función para obtener el total
+  const [searchQuery, setSearchQuery] = useState(""); // Estado para guardar la búsqueda
+
+  // Manejar el cambio en el input
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value); // Actualizamos el estado de búsqueda
+    setSearchTerm(event.target.value); // Pasamos el término de búsqueda al componente padre
+  };
 
   // Calculamos el total de productos y el precio total
   const totalCantidad = cartItems.reduce((acc, item) => acc + item.cantidad, 0); // Suma la cantidad total
@@ -27,7 +35,14 @@ function Header() {
     <header className="d-flex align-items-center justify-content-between p-3 bg-#333333 fixed-top" style={{ backgroundColor: "#333" }}>
       <div className="d-flex align-items-center">
         <img src={logo} alt="Logo" className="logo" style={{ height: "50px" }} />
-        <input type="text" placeholder="Buscar..." className="form-control mx-3" style={{ maxWidth: "300px" }} />
+        <input
+          type="text"
+          placeholder="Buscar..."
+          value={searchQuery}
+          onChange={handleSearchChange}
+          className="form-control mx-3"
+          style={{ maxWidth: "300px" }}
+        />
       </div>
       <div className="d-flex align-items-center">
         <div className="cart mx-3 position-relative">
