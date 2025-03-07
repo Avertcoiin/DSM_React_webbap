@@ -127,7 +127,7 @@ function ProductCarousel({ productos }) {
                                 −
                               </button>
 
-                              <span className="fw-bold">{cantidadProductos[producto.id] || 0}</span>
+                              <span className="fw-bold">{producto.cantidad || 0}</span>
 
                               <button
                                 className="btn btn-success mx-2"

@@ -1,29 +1,46 @@
-// src/pages/Home.jsx
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import ProductCarousel from '../components/ProductCarrousel';// Importa el componente
+import { db } from '../firebase'; // Importa la configuración de Firebase
+import { ref, get } from 'firebase/database'; // Importa las funciones necesarias de Firebase
+import { useCart } from '../context/CartContext'; // Importa el contexto del carrito
+import ProductCarousel from '../components/ProductCarrousel'; // Componente de carrusel
 
 function Home() {
   const [productos, setProductos] = useState([]);
+  const { cartItems } = useCart(); // Accedemos a los elementos del carrito
 
   useEffect(() => {
-    const firebaseUrl = 'https://dsm-vertiz-muro-proyecto-react-default-rtdb.europe-west1.firebasedatabase.app/productos.json';
-    
-    axios.get(firebaseUrl)
-      .then((response) => {
-        const productosArray = [];
-        for (let key in response.data) {
-          productosArray.push({
-            id: key,
-            ...response.data[key],
+    const productosRef = ref(db, 'productos'); // Referencia a la "ruta" donde están los productos
+
+    get(productosRef)
+      .then((snapshot) => {
+        if (snapshot.exists()) {
+          const productosArray = [];
+          snapshot.forEach((childSnapshot) => {
+            const producto = {
+              id: childSnapshot.key,
+              ...childSnapshot.val(),
+            };
+
+            // Buscamos si el producto está en el carrito
+            const cartItem = cartItems.find(item => item.id === producto.id);
+            if (cartItem) {
+              producto.cantidad = cartItem.cantidad; // Asignamos la cantidad desde el carrito
+            } else {
+              producto.cantidad = 0; // Si no está en el carrito, la cantidad es 0
+            }
+
+            productosArray.push(producto); // Agregamos el producto al array
           });
+
+          setProductos(productosArray); // Actualizamos el estado con los productos y sus cantidades
+        } else {
+          console.log("No hay productos disponibles");
         }
-        setProductos(productosArray);
       })
       .catch((error) => {
         console.error('Error al obtener los productos de Firebase:', error);
       });
-  }, []);
+  }, [cartItems]); // Dependemos de `cartItems` para que se actualice cuando cambia el carrito
 
   return (
     <div className="container my-5">
