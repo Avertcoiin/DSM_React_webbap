@@ -13,7 +13,7 @@ function App() {
     <CartProvider>
       <div className='d-flex flex-column min-vh-100'>
         <Header />
-        <div className = "flex-grow-1">
+        <div className = "flex-grow-1 pt-5">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/order-confirm" element={<OrderConfirm />} /> {/* Ruta para OrderConfirm */}
