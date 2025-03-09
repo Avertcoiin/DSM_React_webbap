@@ -16,10 +16,16 @@ function Header() {
 
   // Función para manejar el clic en "Sesión/Pedido"
   const handleOrderClick = () => {
-    if (location.pathname !== "/") {
-      navigate(-1); // Navega hacia atrás en el historial
-    } else {
-      navigate("/order-confirm"); // Redirige al usuario a la página de confirmación de pedido
+    switch (location.pathname) {
+      case "/":
+        navigate("/order-confirm"); // Redirige al usuario a la página de confirmación de pedido
+        break;
+      case "/thank-you":
+        navigate("/"); // Redirige al usuario a la página de inicio
+        break;
+      default:
+        navigate(-1); // Navega hacia atrás en el historial
+        break;
     }
   };
 
