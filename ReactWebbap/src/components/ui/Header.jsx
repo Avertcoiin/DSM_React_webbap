@@ -1,6 +1,8 @@
 // src/components/ui/Header.jsx
-import React from "react";
+import React, {useState, useEffect} from "react";
 import { useNavigate, useLocation } from "react-router-dom"; // Importa el hook useNavigate
+import { onAuthStateChanged } from "firebase/auth"; 
+import {auth} from "../../firebase"; // Asegúrate de que la ruta sea correcta
 import logo from "../../assets/logo.png"; // Asegúrate de que la ruta al logo sea correcta
 import carrito from "../../assets/carrito.jpg"; // Asegúrate de que la ruta al carrito sea correcta
 import { useCart } from "../../context/CartContext"; // Importa el hook del carrito
@@ -9,6 +11,19 @@ function Header() {
   const navigate = useNavigate(); // Usamos el hook useNavigate para redirigir
   const location = useLocation(); // Usamos el hook useLocation para obtener la ruta actual
   const { cartItems, getTotalPrice } = useCart(); // Accede a los productos en el carrito y la función para obtener el total
+  const [user, setUser] = useState(null); // Estado para el usuario
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // Calculamos el total de productos y el precio total
   const totalCantidad = cartItems.reduce((acc, item) => acc + item.cantidad, 0); // Suma la cantidad total
@@ -52,7 +67,15 @@ function Header() {
           </button>
         </div>
         <div className="session-order mx-3">
-          <button className="btn btn-primary">Sesión/Pedido</button>
+        {user ? (
+            <button className="btn btn-primary" onClick={() => navigate("/orders")}>
+              Pedidos
+            </button>
+          ) : (
+            <button className="btn btn-primary" onClick={() => navigate("/login")}>
+              <i className="bi bi-person-circle"></i> Sesión
+            </button>
+          )}
         </div>
 
       </div>
