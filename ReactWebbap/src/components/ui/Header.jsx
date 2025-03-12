@@ -1,7 +1,7 @@
 // src/components/ui/Header.jsx
 import React, {useState, useEffect} from "react";
 import { useNavigate, useLocation } from "react-router-dom"; // Importa el hook useNavigate
-import { onAuthStateChanged } from "firebase/auth"; 
+import { onAuthStateChanged,signOut } from "firebase/auth"; 
 import {auth} from "../../firebase"; // Asegúrate de que la ruta sea correcta
 import logo from "../../assets/logo.png"; // Asegúrate de que la ruta al logo sea correcta
 import carrito from "../../assets/carrito.jpg"; // Asegúrate de que la ruta al carrito sea correcta
@@ -44,6 +44,15 @@ function Header() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  };
+
   return (
     <header className="d-flex align-items-center justify-content-between p-3 bg-#333333 fixed-top" style={{ backgroundColor: "#333" }}>
       <div className="d-flex align-items-center">
@@ -68,9 +77,14 @@ function Header() {
         </div>
         <div className="session-order mx-3">
         {user ? (
-            <button className="btn btn-primary" onClick={() => navigate("/orders")}>
-              Pedidos
-            </button>
+            <>
+              <button className="btn btn-primary me-2" onClick={() => navigate("/orders")}>
+                Pedidos
+              </button>
+              <button className="btn btn-secondary" onClick={handleLogout}>
+                Cerrar Sesión
+              </button>
+            </>
           ) : (
             <button className="btn btn-primary" onClick={() => navigate("/login")}>
               <i className="bi bi-person-circle"></i> Sesión
