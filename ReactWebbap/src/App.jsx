@@ -5,6 +5,7 @@ import Header from './components/ui/Header';
 import OrderConfirm from './pages/OrderConfirm'; // Importa la nueva página de confirmación
 import Formulario from './pages/Formulario';
 import ThankYou from './pages/ThankYou';
+import Login from './pages/Login'; // Importa la nueva página de Login
 import { CartProvider } from './context/CartContext'; // Importa el CartProvider
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -19,6 +20,7 @@ function App() {
             <Route path="/order-confirm" element={<OrderConfirm />} /> {/* Ruta para OrderConfirm */}
             <Route path="/formulario" element={<Formulario />} />
             <Route path="/thank-you" element={<ThankYou />} />
+            <Route path='/Login' element={<Login />} />
           </Routes>
         </div>
         <Footer />
