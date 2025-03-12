@@ -31,16 +31,21 @@ function Header() {
 
   // Función para manejar el clic en "Sesión/Pedido"
   const handleOrderClick = () => {
-    switch (location.pathname) {
-      case "/":
-        navigate("/order-confirm"); // Redirige al usuario a la página de confirmación de pedido
-        break;
-      case "/thank-you":
-        navigate("/"); // Redirige al usuario a la página de inicio
-        break;
-      default:
-        navigate(-1); // Navega hacia atrás en el historial
-        break;
+    if(!user && location.pathname === '/'){
+      navigate("/login"); // Redirige al usuario a la página de inicio de sesión
+      return;
+    } else {
+      switch (location.pathname) {
+        case "/":
+          navigate("/order-confirm"); // Redirige al usuario a la página de confirmación de pedido
+          break;
+        case "/thank-you":
+          navigate("/"); // Redirige al usuario a la página de inicio
+          break;
+        default:
+          navigate(-1); // Navega hacia atrás en el historial
+          break;
+      }
     }
   };
 
