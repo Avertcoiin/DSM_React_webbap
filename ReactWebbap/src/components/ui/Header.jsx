@@ -1,6 +1,8 @@
 // src/components/ui/Header.jsx
-import React from "react";
+import React, {useState, useEffect} from "react";
 import { useNavigate, useLocation } from "react-router-dom"; // Importa el hook useNavigate
+import { onAuthStateChanged,signOut } from "firebase/auth"; 
+import {auth} from "../../firebase"; // Asegúrate de que la ruta sea correcta
 import logo from "../../assets/logo.png"; // Asegúrate de que la ruta al logo sea correcta
 import carrito from "../../assets/carrito.jpg"; // Asegúrate de que la ruta al carrito sea correcta
 import { useCart } from "../../context/CartContext"; // Importa el hook del carrito
@@ -9,6 +11,19 @@ function Header() {
   const navigate = useNavigate(); // Usamos el hook useNavigate para redirigir
   const location = useLocation(); // Usamos el hook useLocation para obtener la ruta actual
   const { cartItems, getTotalPrice } = useCart(); // Accede a los productos en el carrito y la función para obtener el total
+  const [user, setUser] = useState(null); // Estado para el usuario
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   // Calculamos el total de productos y el precio total
   const totalCantidad = cartItems.reduce((acc, item) => acc + item.cantidad, 0); // Suma la cantidad total
@@ -16,16 +31,30 @@ function Header() {
 
   // Función para manejar el clic en "Sesión/Pedido"
   const handleOrderClick = () => {
-    switch (location.pathname) {
-      case "/":
-        navigate("/order-confirm"); // Redirige al usuario a la página de confirmación de pedido
-        break;
-      case "/thank-you":
-        navigate("/"); // Redirige al usuario a la página de inicio
-        break;
-      default:
-        navigate(-1); // Navega hacia atrás en el historial
-        break;
+    if(!user && location.pathname === '/'){
+      navigate("/login"); // Redirige al usuario a la página de inicio de sesión
+      return;
+    } else {
+      switch (location.pathname) {
+        case "/":
+          navigate("/order-confirm"); // Redirige al usuario a la página de confirmación de pedido
+          break;
+        case "/thank-you":
+          navigate("/"); // Redirige al usuario a la página de inicio
+          break;
+        default:
+          navigate(-1); // Navega hacia atrás en el historial
+          break;
+      }
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
     }
   };
 
@@ -52,7 +81,20 @@ function Header() {
           </button>
         </div>
         <div className="session-order mx-3">
-          <button className="btn btn-primary">Sesión/Pedido</button>
+        {user ? (
+            <>
+              <button className="btn btn-primary me-2" onClick={() => navigate("/Pedidos")}>
+                Pedidos
+              </button>
+              <button className="btn btn-secondary" onClick={handleLogout}>
+                Cerrar Sesión
+              </button>
+            </>
+          ) : (
+            <button className="btn btn-primary" onClick={() => navigate("/login")}>
+              <i className="bi bi-person-circle"></i> Sesión
+            </button>
+          )}
         </div>
 
       </div>
