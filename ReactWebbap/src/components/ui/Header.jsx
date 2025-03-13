@@ -6,6 +6,9 @@ import {auth} from "../../firebase"; // Asegúrate de que la ruta sea correcta
 import logo from "../../assets/logo.png"; // Asegúrate de que la ruta al logo sea correcta
 import carrito from "../../assets/carrito.jpg"; // Asegúrate de que la ruta al carrito sea correcta
 import { useCart } from "../../context/CartContext"; // Importa el hook del carrito
+import { Dropdown } from 'react-bootstrap'; // Importa el componente Dropdown de react-bootstrap
+
+
 
 function Header() {
   const navigate = useNavigate(); // Usamos el hook useNavigate para redirigir
@@ -80,16 +83,18 @@ function Header() {
             {location.pathname !== "/" ? "Atrás" : "Realizar Pedido"}
           </button>
         </div>
-        <div className="session-order mx-3">
+        <div className="session-order mx-3 d-flex flex-row align-items-center">
         {user ? (
-            <>
-              <button className="btn btn-primary me-2" onClick={() => navigate("/Pedidos")}>
-                Pedidos
-              </button>
-              <button className="btn btn-secondary" onClick={handleLogout}>
-                Cerrar Sesión
-              </button>
-            </>
+            <Dropdown>
+              <Dropdown.Toggle variant="primary" id="dropdown-basic">
+                <i className="bi bi-person-circle"></i> Cuenta
+              </Dropdown.Toggle>
+
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={() => navigate("/Pedidos")}>Pedidos</Dropdown.Item>
+                <Dropdown.Item onClick={handleLogout}>Cerrar Sesión</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
           ) : (
             <button className="btn btn-primary" onClick={() => navigate("/login")}>
               <i className="bi bi-person-circle"></i> Sesión
