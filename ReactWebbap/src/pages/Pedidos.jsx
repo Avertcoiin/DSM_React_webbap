@@ -1,23 +1,40 @@
 import React, { useEffect, useState } from "react";
-import { db } from "../firebase"; // Asegúrate de que la ruta sea correcta
+import { db,auth } from "../firebase"; // Asegúrate de que la ruta sea correcta
 import { ref, onValue } from "firebase/database";
+import { onAuthStateChanged } from "firebase/auth";
 
 function Pedidos() {
   const [orders, setOrders] = useState([]);
+  const [userId, setUserid] = useState(null);
 
   useEffect(() => {
-    const ordersRef = ref(db, 'orders');
-    onValue(ordersRef, (snapshot) => {
-      const data = snapshot.val();
-      if (data) {
-        const ordersList = Object.keys(data).map(key => ({
-          id: key,
-          ...data[key]
-        }));
-        setOrders(ordersList);
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserid(user.uid); // Guarda la ID del usuario en el estado
+      } else {
+        setUserid(null);
       }
     });
+
+    return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if(userId){
+      const ordersRef = ref(db, 'orders');
+      onValue(ordersRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          const ordersList = Object.keys(data).map(key => ({
+            id: key,
+            ...data[key]
+          }))
+          .filter(order => order.userId === userId); // Filtra los pedidos por la ID del usuario
+          setOrders(ordersList);
+        }
+      });
+    }
+  }, [userId]);
 
   return (
     <div className="container my-5">
