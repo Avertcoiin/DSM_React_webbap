@@ -20,7 +20,6 @@ function OrderForm() {
 
     // capturar el id del usuario
     const [userid,setUserid] = useState(null);
-    console.log(userid);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -51,7 +50,8 @@ function OrderForm() {
             id: item.id,
             cantidad: item.cantidad,
             precio: item.precio,
-            nombre: item.nombre
+            nombre: item.nombre,
+            archivo: item.archivo
         }));
 
         // Calcular el tiempo de envío máximo

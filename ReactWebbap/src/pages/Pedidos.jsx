@@ -10,6 +10,7 @@ function Pedidos() {
   const [userId, setUserid] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState(null);
+  const [expandedOrderId, setExpandedOrderId] = useState(null); // Estado para controlar el despliegue
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -61,6 +62,10 @@ function Pedidos() {
     }
   };
 
+  const toggleExpand = (orderId) => {
+    setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
+  };
+
   return (
     <div className="container my-5">
       <h2 className="text-center mb-4">Pedidos</h2>
@@ -71,30 +76,44 @@ function Pedidos() {
           <ul className="list-group">
             {orders.map(order => (
               <li key={order.id} className="list-group-item">
-                <h5>Pedido ID: {order.id}</h5>
-                <p>Nombre: {order.nombre}</p>
-                <p>Apellidos: {order.apellidos}</p>
-                <p>Teléfono: {order.telefono}</p>
-                <p>Correo: {order.correo}</p>
-                <p>Dirección: {order.direccion}</p>
-                <p>Total: {order.totalPrice}€</p>
-                <p>Fecha: {new Date(order.timestamp).toLocaleString()}</p>
-                <h6>Productos:</h6>
-                <ul>
+                <div className="d-flex justify-content-between align-items-center">
+                  <span>{new Date(order.timestamp).toLocaleString()}</span>
+                  <span>{order.totalPrice}€</span>
+                  <button
+                    className="btn btn-link"
+                    onClick={() => toggleExpand(order.id)}
+                  >
+                    {expandedOrderId === order.id ? "Ocultar" : "Mostrar"} detalles
+                  </button>
+                </div>
+                <div className="mt-3">
+                  <h6>Productos:</h6>
+                  <ul className="list-group">
                   {order.items.map((item, index) => (
-                    <li key={index}>
-                      {item.nombre} - {item.cantidad} x {item.precio}€
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  className="btn btn-danger mt-3"
-                  data-bs-toggle="modal"
-                  data-bs-target="#deleteModal"
-                  onClick={() => handleDelete(order.id)}
-                >
-                  Borrar Pedido
-                </button>
+                        <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
+                          <img src={item.archivo} alt={item.nombre} className="img-thumbnail" style={{ width: '50px', height: '50px' }} />
+                          <span>{item.nombre}</span>
+                          <span>{item.cantidad} x {item.precio}€</span>
+                        </li>
+                      ))}
+                    </ul>
+                </div>
+
+                {expandedOrderId === order.id && (
+                  <div className="mt-3">
+                    <p>Nombre: {order.nombre}</p>
+                    <p>Apellidos: {order.apellidos}</p>
+                    <p>Teléfono: {order.telefono}</p>
+                    <p>Correo: {order.correo}</p>
+                    <p>Dirección: {order.direccion}</p>
+                    <button
+                      className="btn btn-danger mt-3"
+                      onClick={() => handleDelete(order.id)}
+                    >
+                      Borrar Pedido
+                    </button>
+                  </div>
+                )}
               </li>
             ))}
           </ul>
@@ -102,7 +121,7 @@ function Pedidos() {
       </div>
 
       {/* Modal de confirmación */}
-      <Modal show={showModal} onHide={() => setShowModal(false)} id="deleteModal">
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Confirmar eliminación</Modal.Title>
         </Modal.Header>
