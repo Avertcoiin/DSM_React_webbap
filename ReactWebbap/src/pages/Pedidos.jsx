@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { db,auth } from "../firebase"; // Asegúrate de que la ruta sea correcta
+import { db, auth } from "../firebase"; // Asegúrate de que la ruta sea correcta
 import { ref, onValue, remove } from "firebase/database";
 import { onAuthStateChanged } from "firebase/auth";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {modal, Button} from 'react-bootstrap';
+import { Modal, Button } from 'react-bootstrap';
 
 function Pedidos() {
   const [orders, setOrders] = useState([]);
@@ -24,16 +24,17 @@ function Pedidos() {
   }, []);
 
   useEffect(() => {
-    if(userId){
+    if (userId) {
       const ordersRef = ref(db, 'orders');
       onValue(ordersRef, (snapshot) => {
         const data = snapshot.val();
         if (data) {
-          const ordersList = Object.keys(data).map(key => ({
-            id: key,
-            ...data[key]
-          }))
-          .filter(order => order.userId === userId); // Filtra los pedidos por la ID del usuario
+          const ordersList = Object.keys(data)
+            .map(key => ({
+              id: key,
+              ...data[key]
+            }))
+            .filter(order => order.userId === userId); // Filtra los pedidos por la ID del usuario
           setOrders(ordersList);
         }
       });
@@ -44,6 +45,7 @@ function Pedidos() {
     setOrderToDelete(orderId);
     setShowModal(true);
   };
+
   const confirmDelete = () => {
     if (orderToDelete) {
       const orderRef = ref(db, `orders/${orderToDelete}`);
@@ -87,6 +89,8 @@ function Pedidos() {
                 </ul>
                 <button
                   className="btn btn-danger mt-3"
+                  data-bs-toggle="modal"
+                  data-bs-target="#deleteModal"
                   onClick={() => handleDelete(order.id)}
                 >
                   Borrar Pedido
@@ -96,6 +100,24 @@ function Pedidos() {
           </ul>
         )}
       </div>
+
+      {/* Modal de confirmación */}
+      <Modal show={showModal} onHide={() => setShowModal(false)} id="deleteModal">
+        <Modal.Header closeButton>
+          <Modal.Title>Confirmar eliminación</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          ¿Estás seguro de que deseas borrar este pedido?
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Cancelar
+          </Button>
+          <Button variant="danger" onClick={confirmDelete}>
+            Borrar
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 }
