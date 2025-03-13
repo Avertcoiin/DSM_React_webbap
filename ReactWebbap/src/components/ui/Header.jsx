@@ -83,7 +83,7 @@ function Header() {
         <div className="session-order mx-3">
         {user ? (
             <>
-              <button className="btn btn-primary me-2" onClick={() => navigate("/orders")}>
+              <button className="btn btn-primary me-2" onClick={() => navigate("/Pedidos")}>
                 Pedidos
               </button>
               <button className="btn btn-secondary" onClick={handleLogout}>

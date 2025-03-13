@@ -13,7 +13,7 @@ function ThankYou() {
           REALIZAR UN NUEVO PEDIDO
         </button>
         
-        <button className="btn btn-primary btn-lg" onClick={() => navigate("/orders")}>
+        <button className="btn btn-primary btn-lg" onClick={() => navigate("/Pedidos")}>
           VER PEDIDOS
         </button>
       </div>
