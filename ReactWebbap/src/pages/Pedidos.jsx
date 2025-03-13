@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { db,auth } from "../firebase"; // Asegúrate de que la ruta sea correcta
-import { ref, onValue } from "firebase/database";
+import { ref, onValue, remove } from "firebase/database";
 import { onAuthStateChanged } from "firebase/auth";
+import 'bootstrap/dist/css/bootstrap.min.css';
+import {modal, Button} from 'react-bootstrap';
 
 function Pedidos() {
   const [orders, setOrders] = useState([]);
   const [userId, setUserid] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState(null);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -36,6 +40,25 @@ function Pedidos() {
     }
   }, [userId]);
 
+  const handleDelete = (orderId) => {
+    setOrderToDelete(orderId);
+    setShowModal(true);
+  };
+  const confirmDelete = () => {
+    if (orderToDelete) {
+      const orderRef = ref(db, `orders/${orderToDelete}`);
+      remove(orderRef)
+        .then(() => {
+          setOrders(orders.filter(order => order.id !== orderToDelete));
+          setShowModal(false);
+          setOrderToDelete(null);
+        })
+        .catch((error) => {
+          console.error("Error al borrar el pedido: ", error);
+        });
+    }
+  };
+
   return (
     <div className="container my-5">
       <h2 className="text-center mb-4">Pedidos</h2>
@@ -62,6 +85,12 @@ function Pedidos() {
                     </li>
                   ))}
                 </ul>
+                <button
+                  className="btn btn-danger mt-3"
+                  onClick={() => handleDelete(order.id)}
+                >
+                  Borrar Pedido
+                </button>
               </li>
             ))}
           </ul>
