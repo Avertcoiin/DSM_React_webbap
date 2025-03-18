@@ -78,7 +78,7 @@ function Pedidos() {
               <li key={order.id} className="list-group-item">
                 <div className="d-flex justify-content-between align-items-center">
                   <span>{new Date(order.timestamp).toLocaleString()}</span>
-                  <span>{order.totalPrice}€</span>
+                  <span>{order.totalPrice.toFixed(2)}€</span>
                   <button
                     className="btn btn-link"
                     onClick={() => toggleExpand(order.id)}
