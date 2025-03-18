@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase"; // Asegúrate de que la ruta sea correcta
-import { deleteUser } from "firebase/auth";
+import { deleteUser, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
 import { ref, remove, query, orderByChild, equalTo, get } from "firebase/database";
-import { Modal, Button } from 'react-bootstrap'; // Importa los componentes Modal y Button de react-bootstrap
+import { Modal, Button, Form } from 'react-bootstrap'; // Importa los componentes Modal, Button y Form de react-bootstrap
 
 function BorrarUsuario() {
   const [error, setError] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -53,6 +55,10 @@ function BorrarUsuario() {
     const user = auth.currentUser;
     if (user) {
       try {
+        // Reautenticar al usuario
+        const credential = EmailAuthProvider.credential(email, password);
+        await reauthenticateWithCredential(user, credential);
+
         // Eliminar todos los pedidos del usuario
         const ordersRef = ref(db, 'orders');
         const userOrdersQuery = query(ordersRef, orderByChild('userId'), equalTo(user.uid));
@@ -114,6 +120,26 @@ function BorrarUsuario() {
         </Modal.Header>
         <Modal.Body>
           <p>¿Estás seguro de que deseas borrar tu cuenta? Esta acción es irreversible.</p>
+          <Form>
+            <Form.Group controlId="formEmail">
+              <Form.Label>Email</Form.Label>
+              <Form.Control
+                type="email"
+                placeholder="Introduce tu email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group controlId="formPassword" className="mt-3">
+              <Form.Label>Contraseña</Form.Label>
+              <Form.Control
+                type="password"
+                placeholder="Introduce tu contraseña"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Form.Group>
+          </Form>
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseModal}>
