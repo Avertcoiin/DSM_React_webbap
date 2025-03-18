@@ -1,32 +1,33 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase"; // Asegúrate de que la ruta sea correcta
 
-function Login() {
+function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      setError("Las contraseñas no coinciden");
+      return;
+    }
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate("/"); // Redirige al usuario a la página de inicio después del login
+      await createUserWithEmailAndPassword(auth, email, password);
+      navigate("/"); // Redirige al usuario a la página de inicio después del registro
     } catch (error) {
       setError(error.message);
     }
   };
 
-  const handleRegister = () => {
-    navigate("/Register"); // Redirige al usuario a la página de registro
-  };
-
   return (
     <div className="container mt-5">
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
+      <h2>Registro</h2>
+      <form onSubmit={handleRegister}>
         <div className="mb-3">
           <label htmlFor="email" className="form-label">Email</label>
           <input
@@ -39,7 +40,7 @@ function Login() {
           />
         </div>
         <div className="mb-3">
-          <label htmlFor="password" className="form-label">Password</label>
+          <label htmlFor="password" className="form-label">Contraseña</label>
           <input
             type="password"
             className="form-control"
@@ -49,12 +50,24 @@ function Login() {
             required
           />
         </div>
+        <div className="mb-3">
+          <label htmlFor="confirmPassword" className="form-label">Confirmar Contraseña</label>
+          <input
+            type="password"
+            className="form-control"
+            id="confirmPassword"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+        </div>
         {error && <div className="alert alert-danger">{error}</div>}
-        <button type="submit" className="btn btn-primary mb-4">Login</button>
-        <button type="button" className="btn btn-secondary ms-2 mb-4" onClick={handleRegister}>Registrarse</button>
+        <div className="mb-3">
+            <button type="submit" className="btn btn-primary">Registrarse</button>
+        </div>
       </form>
     </div>
   );
 }
 
-export default Login;
+export default Register;

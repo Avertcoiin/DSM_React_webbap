@@ -7,6 +7,8 @@ import Formulario from './pages/Formulario';
 import ThankYou from './pages/ThankYou';
 import Login from './pages/Login'; // Importa la nueva página de Login
 import Pedidos from './pages/Pedidos.jsx'; // Importa la nueva página de Orders
+import Register from './pages/Register'; // Importa la nueva página de Register
+import BorrarUsuario from './pages/BorrarUsuario'; // Importa la nueva página de BorrarUsuario
 import { CartProvider } from './context/CartContext'; // Importa el CartProvider
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -23,6 +25,8 @@ function App() {
             <Route path="/thank-you" element={<ThankYou />} />
             <Route path='/Login' element={<Login />} />
             <Route path='/Pedidos' element={<Pedidos />} />
+            <Route path='/Register'element={<Register />} />
+            <Route path='/BorrarUsuario' element={<BorrarUsuario />} />
           </Routes>
         </div>
         <Footer />
