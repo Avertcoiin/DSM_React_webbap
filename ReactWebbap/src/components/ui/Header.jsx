@@ -1,5 +1,5 @@
 // src/components/ui/Header.jsx
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect,useRef} from "react";
 import { useNavigate, useLocation } from "react-router-dom"; // Importa el hook useNavigate
 import { onAuthStateChanged,signOut } from "firebase/auth"; 
 import {auth} from "../../firebase"; // Asegúrate de que la ruta sea correcta
@@ -7,6 +7,7 @@ import logo from "../../assets/logo.png"; // Asegúrate de que la ruta al logo s
 import carrito from "../../assets/carrito.jpg"; // Asegúrate de que la ruta al carrito sea correcta
 import { useCart } from "../../context/CartContext"; // Importa el hook del carrito
 import { Dropdown } from 'react-bootstrap'; // Importa el componente Dropdown de react-bootstrap
+import { Prev } from "react-bootstrap/esm/PageItem";
 
 
 
@@ -48,7 +49,7 @@ function Header() {
         case "/Pedidos":
           navigate("/");
         break;
-        if (location.pathname === "/thank-you") {
+        if (location.pathname === "/thank-you" || prevLocation.pathname === location.pathname) {
           navigate("/"); // Redirige al usuario a la página de inicio si la ruta anterior es /thank-you
         } else {
           navigate(-1); // Navega hacia atrás en el historial
@@ -99,6 +100,7 @@ function Header() {
               <Dropdown.Menu>
                 <Dropdown.Item onClick={() => navigate("/Pedidos")}>Pedidos</Dropdown.Item>
                 <Dropdown.Item onClick={handleLogout}>Cerrar Sesión</Dropdown.Item>
+                <Dropdown.Item onClick={() => navigate("/BorrarUsuario")}>Borrar usuario</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
           ) : (
