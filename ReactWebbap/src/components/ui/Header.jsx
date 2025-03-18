@@ -45,8 +45,14 @@ function Header() {
         case "/thank-you":
           navigate("/"); // Redirige al usuario a la página de inicio
           break;
-        default:
+        case "/Pedidos":
+          navigate("/");
+        break;
+        if (location.pathname === "/thank-you") {
+          navigate("/"); // Redirige al usuario a la página de inicio si la ruta anterior es /thank-you
+        } else {
           navigate(-1); // Navega hacia atrás en el historial
+        }
           break;
       }
     }
