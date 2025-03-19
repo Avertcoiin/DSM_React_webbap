@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { db, auth } from "../firebase"; // Asegúrate de que la ruta sea correcta
-import { ref, onValue, remove } from "firebase/database";
+import { get, ref, update, onValue, remove } from "firebase/database";
 import { onAuthStateChanged } from "firebase/auth";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal, Button } from 'react-bootstrap';
@@ -50,15 +50,71 @@ function Pedidos() {
   const confirmDelete = () => {
     if (orderToDelete) {
       const orderRef = ref(db, `orders/${orderToDelete}`);
-      remove(orderRef)
-        .then(() => {
-          setOrders(orders.filter(order => order.id !== orderToDelete));
-          setShowModal(false);
-          setOrderToDelete(null);
-        })
-        .catch((error) => {
-          console.error("Error al borrar el pedido: ", error);
-        });
+  
+      // Obtener los datos del pedido antes de borrarlo para restaurar el stock
+      const orderToDeleteRef = ref(db, `orders/${orderToDelete}`);
+  
+      onValue(orderToDeleteRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const orderData = snapshot.val();
+  
+          // Crear un array para almacenar las promesas
+          const updates = [];
+  
+          // Recorremos los productos del pedido y restauramos el stock
+          orderData.items.forEach(item => {
+            const productRef = ref(db, `productos/${item.id}/uds`); // Referencia al stock del producto
+  
+            // Usamos get para obtener las unidades actuales del producto
+            updates.push(
+              get(productRef)  // Obtener las unidades actuales
+                .then(snapshot => {
+                  if (snapshot.exists()) {
+                    const stockActual = snapshot.val(); // Valor actual del stock
+                    const nuevoStock = stockActual + item.cantidad; // Aumentamos las unidades del producto
+                    return {
+                      path: `productos/${item.id}/uds`, // El camino de la actualización
+                      value: nuevoStock, // El valor actualizado
+                    };
+                  }
+                })
+                .catch((error) => {
+                  console.error("Error al obtener el stock del producto:", error);
+                })
+            );
+          });
+  
+          // Esperar a que todas las promesas de actualizaciones se resuelvan
+          Promise.all(updates)
+            .then(results => {
+              // Crear un objeto de actualizaciones para Firebase
+              const updatesObject = {};
+  
+              // Llenamos el objeto de actualizaciones con los resultados obtenidos
+              results.forEach(result => {
+                if (result) {
+                  updatesObject[result.path] = result.value;
+                }
+              });
+  
+              // Realizamos la actualización del stock
+              return update(ref(db), updatesObject);
+            })
+            .then(() => {
+              // Después de actualizar el stock, eliminar el pedido de la base de datos
+              return remove(orderRef);
+            })
+            .then(() => {
+              // Actualizar el estado de los pedidos en la UI
+              setOrders(orders.filter(order => order.id !== orderToDelete));
+              setShowModal(false);
+              setOrderToDelete(null); // Limpiar el estado del pedido a eliminar
+            })
+            .catch((error) => {
+              console.error("Error al actualizar el stock o eliminar el pedido:", error);
+            });
+        }
+      });
     }
   };
 
@@ -89,14 +145,14 @@ function Pedidos() {
                 <div className="mt-3">
                   <h6>Productos:</h6>
                   <ul className="list-group">
-                  {order.items.map((item, index) => (
-                        <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
-                          <img src={item.archivo} alt={item.nombre} className="img-thumbnail" style={{ width: '50px', height: '50px' }} />
-                          <span>{item.nombre}</span>
-                          <span>{item.cantidad} x {item.precio}€</span>
-                        </li>
-                      ))}
-                    </ul>
+                    {order.items.map((item, index) => (
+                      <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
+                        <img src={item.archivo} alt={item.nombre} className="img-thumbnail" style={{ width: '50px', height: '50px' }} />
+                        <span>{item.nombre}</span>
+                        <span>{item.cantidad} x {item.precio}€</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
                 {expandedOrderId === order.id && (
