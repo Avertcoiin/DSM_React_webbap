@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth } from "../../firebase";
@@ -15,6 +15,8 @@ function Header() {
   const { searchTerm, setSearchTerm } = useSearch();
   const [user, setUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState(searchTerm);
+  const prevLocationRef = useRef(location.pathname); // Usamos useRef para almacenar la ruta anterior
+
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -29,15 +31,19 @@ function Header() {
     setSearchTerm(event.target.value);
   };
 
+  useEffect(() => {
+    prevLocationRef.current = location.pathname; // Actualizamos la ruta anterior en cada renderizado
+  }, [location.pathname]);
+
   const totalCantidad = cartItems.reduce((acc, item) => acc + item.cantidad, 0);
   const totalPrecio = getTotalPrice();
 
   const handleOrderClick = () => {
     if (!user) {
       navigate("/login");
-    } else if (location.pathname === "/") {
+    } else if (location.pathname === "/" ) {
       navigate("/order-confirm");
-    } else if (location.pathname === "/thank-you") {
+    } else if (location.pathname === "/thank-you" || prevLocationRef.current === location.pathname) {
       navigate("/");
     } else {
       navigate(-1);
