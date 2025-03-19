@@ -3,8 +3,7 @@ COSAS PENDIENTES:
   - Asegurarse de que si el usuario navega manualmente no pueda ir a páginas que no debería. Que el usuario tenga que tener productos para poder hacer un pedido, que solo pueda acceder a sus pedidos etc.
   - Arreglar que el Header se coma los títulos de las páginas.
   - Que no se pierda la info del formulario si voy atrás.
-  - Hacer que cuando se compre algo reduzca las unidades.
-  - Añadir límite de compra según unidades restantes.
+  - Añadir límite de compra según unidades restantes. 
 
 ESPECIFICACIONES QUE FALTAN POR HACER:
 Un menú superior nos dará opción de acceder a la página principal de realización de
@@ -13,5 +12,3 @@ pantalla mostrará un listado de los pedidos, que se podrán pulsar para ver la 
 completa del mismo con información del solicitante.
 
 Desplegar el proyecto una vez acabado.
-
-Hacer login.

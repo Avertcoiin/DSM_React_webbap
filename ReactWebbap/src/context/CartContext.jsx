@@ -10,7 +10,7 @@ export const useCart = () => {
 
 // Crea el CartProvider. Este componente proveerá el estado y las funciones para el carrito
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]); // Estado del carrito
+  const [cartItems, setCartItems] = useState([]); // Estado del carrito.
 
   // Función para agregar al carrito
   const addToCart = (product) => {
