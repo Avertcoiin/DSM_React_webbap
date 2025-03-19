@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useCart } from '../context/CartContext'; // Asegúrate de que esta importación esté correcta
 import { useNavigate } from 'react-router-dom'; // Para la navegación
-import { db,auth } from '../firebase'; // Importa la instancia de la base de datos
-import { ref, set, push } from 'firebase/database'; // Importa las funciones necesarias de Firebase
+import { db, auth } from '../firebase'; // Importa la instancia de la base de datos
+import { ref, set, push, get, update } from "firebase/database"; // Importa las funciones de Firebase
 import { onAuthStateChanged } from 'firebase/auth';
 
 function OrderForm() {
@@ -19,7 +19,7 @@ function OrderForm() {
     });
 
     // capturar el id del usuario
-    const [userid,setUserid] = useState(null);
+    const [userid, setUserid] = useState(null);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -36,8 +36,6 @@ function OrderForm() {
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
-
-
 
     const handleSubmit = (e) => {
         e.preventDefault(); // Evita el comportamiento predeterminado del formulario
@@ -70,18 +68,61 @@ function OrderForm() {
         // Subir la orden a Firebase
         const orderRef = ref(db, 'orders'); // Define el path donde se almacenarán los datos
         const newOrderRef = push(orderRef); // Crea una nueva referencia única para la orden
+
         set(newOrderRef, orderData) // Sube los datos de la orden a Firebase
             .then(() => {
-                // Si la subida fue exitosa, vaciar el carrito
+                // Ahora actualizamos las unidades de los productos en la base de datos
+                const updates = [];
+
+                // Recorremos los productos del carrito
+                cartItems.forEach(item => {
+                    const productRef = ref(db, `productos/${item.id}/uds`); // Referencia al stock del producto
+                    updates.push(
+                        get(productRef)  // Obtener las unidades actuales
+                            .then(snapshot => {
+                                if (snapshot.exists()) {
+                                    const stockActual = snapshot.val();
+                                    const nuevoStock = stockActual - item.cantidad; // Restamos las unidades compradas
+                                    // Aseguramos que el stock no sea negativo
+                                    return {
+                                        path: `productos/${item.id}/uds`,
+                                        value: Math.max(nuevoStock, 0),
+                                    };
+                                }
+                            })
+                            .catch((error) => {
+                                console.error("Error al obtener el stock del producto:", error);
+                            })
+                    );
+                });
+
+                // Esperar a que todas las promesas se resuelvan antes de hacer la actualización
+                return Promise.all(updates);
+            })
+            .then(results => {
+                // Realizamos la actualización de los productos en Firebase
+                const updatesObject = {};
+
+                // Llenamos el objeto updatesObject con los resultados obtenidos
+                results.forEach(result => {
+                    if (result) {
+                        updatesObject[result.path] = result.value;
+                    }
+                });
+
+                // Actualizamos el stock de los productos en Firebase
+                return update(ref(db), updatesObject); // Realiza la actualización
+            })
+            .then(() => {
+                // Si la actualización fue exitosa, vaciar el carrito
                 clearCart(); // Borra el carrito
                 navigate('/thank-you'); // Redirige al usuario a la página de agradecimiento
             })
             .catch((error) => {
                 // Manejar errores, si ocurren
-                console.error("Error al subir la orden: ", error);
+                console.error("Error al subir la orden o actualizar el stock:", error);
             });
     };
-
 
     return (
         <div className="container my-5">
