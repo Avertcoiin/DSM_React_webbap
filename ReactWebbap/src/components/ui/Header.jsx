@@ -1,38 +1,60 @@
-// src/components/ui/Header.jsx
-import React, { useState } from "react";
-import { useNavigate, useLocation } from "react-router-dom"; 
-import logo from "../../assets/logo.png"; 
-import carrito from "../../assets/carrito.jpg"; 
-import { useCart } from "../../context/CartContext"; 
-import { useSearch } from "../../context/SearchContext"; // Usamos el hook del contexto de búsqueda
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { onAuthStateChanged, signOut } from "firebase/auth";
+import { auth } from "../../firebase";
+import logo from "../../assets/logo.png";
+import carrito from "../../assets/carrito.jpg";
+import { useCart } from "../../context/CartContext";
+import { useSearch } from "../../context/SearchContext";
+import { Dropdown } from "react-bootstrap";
 
 function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const { cartItems, getTotalPrice } = useCart();
-  const { searchTerm, setSearchTerm } = useSearch(); // Usamos el término de búsqueda desde el contexto
-
+  const { searchTerm, setSearchTerm } = useSearch();
+  const [user, setUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState(searchTerm);
 
-  // Manejar el cambio en el input de búsqueda
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user ? user : null);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value); 
-    setSearchTerm(event.target.value); // Actualizamos el término de búsqueda en el contexto
+    setSearchQuery(event.target.value);
+    setSearchTerm(event.target.value);
   };
 
-  const totalCantidad = cartItems.reduce((acc, item) => acc + item.cantidad, 0); 
-  const totalPrecio = getTotalPrice(); 
+  const totalCantidad = cartItems.reduce((acc, item) => acc + item.cantidad, 0);
+  const totalPrecio = getTotalPrice();
 
   const handleOrderClick = () => {
-    if (location.pathname !== "/") {
-      navigate(-1); 
+    if (!user) {
+      navigate("/login");
+    } else if (location.pathname === "/") {
+      navigate("/order-confirm");
+    } else if (location.pathname === "/thank-you") {
+      navigate("/");
     } else {
-      navigate("/order-confirm"); 
+      navigate(-1);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
     }
   };
 
   return (
-    <header className="d-flex align-items-center justify-content-between p-3 bg-#333333 fixed-top" style={{ backgroundColor: "#333" }}>
+    <header className="d-flex align-items-center justify-content-between p-3 bg-dark fixed-top">
       <div className="d-flex align-items-center">
         <img src={logo} alt="Logo" className="logo" style={{ height: "50px" }} />
         <input
@@ -51,19 +73,32 @@ function Header() {
             {totalCantidad}
           </span>
         </div>
-
         <div className="total mx-3 text-light">
-          <span>Total: {totalPrecio.toFixed(2)}€</span> {/* Muestra el total en precio */}
+          <span>Total: {totalPrecio.toFixed(2)}€</span>
         </div>
         <div className="session-order mx-3">
           <button className="btn btn-success" onClick={handleOrderClick}>
             {location.pathname !== "/" ? "Atrás" : "Realizar Pedido"}
           </button>
         </div>
-        <div className="session-order mx-3">
-          <button className="btn btn-primary">Sesión/Pedido</button>
+        <div className="session-order mx-3 d-flex flex-row align-items-center">
+          {user ? (
+            <Dropdown>
+              <Dropdown.Toggle variant="primary" id="dropdown-basic">
+                <i className="bi bi-person-circle"></i> Cuenta
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={() => navigate("/pedidos")}>Pedidos</Dropdown.Item>
+                <Dropdown.Item onClick={handleLogout}>Cerrar Sesión</Dropdown.Item>
+                <Dropdown.Item onClick={() => navigate("/borrar-usuario")}>Borrar usuario</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          ) : (
+            <button className="btn btn-primary" onClick={() => navigate("/login")}>
+              <i className="bi bi-person-circle"></i> Iniciar Sesión
+            </button>
+          )}
         </div>
-
       </div>
     </header>
   );

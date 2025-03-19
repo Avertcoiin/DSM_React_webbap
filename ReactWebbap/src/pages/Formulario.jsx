@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useCart } from '../context/CartContext'; // Asegúrate de que esta importación esté correcta
 import { useNavigate } from 'react-router-dom'; // Para la navegación
-import { db } from '../firebase'; // Importa la instancia de la base de datos
+import { db,auth } from '../firebase'; // Importa la instancia de la base de datos
 import { ref, set, push } from 'firebase/database'; // Importa las funciones necesarias de Firebase
+import { onAuthStateChanged } from 'firebase/auth';
 
 function OrderForm() {
     const navigate = useNavigate(); // Hook para manejar la navegación
@@ -17,9 +18,26 @@ function OrderForm() {
         direccion: ''
     });
 
+    // capturar el id del usuario
+    const [userid,setUserid] = useState(null);
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setUserid(user.uid); // Guarda la ID del usuario en el estado
+            } else {
+                setUserid(null);
+            }
+        });
+
+        return () => unsubscribe();
+    }, []);
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
+
+
 
     const handleSubmit = (e) => {
         e.preventDefault(); // Evita el comportamiento predeterminado del formulario
@@ -32,7 +50,8 @@ function OrderForm() {
             id: item.id,
             cantidad: item.cantidad,
             precio: item.precio,
-            nombre: item.nombre
+            nombre: item.nombre,
+            archivo: item.archivo
         }));
 
         // Calcular el tiempo de envío máximo
@@ -41,6 +60,7 @@ function OrderForm() {
         // Crear el objeto de la orden
         const orderData = {
             ...formDataWithoutSensitive,
+            userId: userid, // ID del usuario
             items: itemsDetails, // Productos comprados
             totalPrice: getTotalPrice(), // Precio total de la compra
             tiempoEnvio: maxTiempoEnvio, // Tiempo máximo de entrega

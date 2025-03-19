@@ -4,7 +4,7 @@ function ThankYou() {
   const navigate = useNavigate();
 
   return (
-    <div className="thank-you text-center d-flex flex-column justify-content-center align-items-center">
+    <div className="thank-you text-center d-flex flex-column justify-content-center align-items-center mt-5">
       <h2>¡Gracias por tu compra!</h2>
       <p>Tu pedido ha sido realizado con éxito.</p>
       
@@ -13,7 +13,7 @@ function ThankYou() {
           REALIZAR UN NUEVO PEDIDO
         </button>
         
-        <button className="btn btn-primary btn-lg" onClick={() => navigate("/orders")}>
+        <button className="btn btn-primary btn-lg" onClick={() => navigate("/Pedidos")}>
           VER PEDIDOS
         </button>
       </div>
