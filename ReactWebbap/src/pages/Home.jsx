@@ -1,15 +1,18 @@
+// src/pages/Home.jsx
 import React, { useState, useEffect } from 'react';
-import { db } from '../firebase'; // Importa la configuración de Firebase
-import { ref, get } from 'firebase/database'; // Importa las funciones necesarias de Firebase
-import { useCart } from '../context/CartContext'; // Importa el contexto del carrito
-import ProductCarousel from '../components/ProductCarrousel'; // Componente de carrusel
+import { db } from '../firebase'; 
+import { ref, get } from 'firebase/database'; 
+import { useCart } from '../context/CartContext'; 
+import ProductCarousel from '../components/ProductCarrousel'; 
+import { useSearch } from '../context/SearchContext'; // Usamos el hook del contexto de búsqueda
 
 function Home() {
   const [productos, setProductos] = useState([]);
-  const { cartItems } = useCart(); // Accedemos a los elementos del carrito
+  const { cartItems } = useCart();
+  const { searchTerm } = useSearch(); // Obtenemos el término de búsqueda del contexto
 
   useEffect(() => {
-    const productosRef = ref(db, 'productos'); // Referencia a la "ruta" donde están los productos
+    const productosRef = ref(db, 'productos'); 
 
     get(productosRef)
       .then((snapshot) => {
@@ -21,18 +24,17 @@ function Home() {
               ...childSnapshot.val(),
             };
 
-            // Buscamos si el producto está en el carrito
             const cartItem = cartItems.find(item => item.id === producto.id);
             if (cartItem) {
-              producto.cantidad = cartItem.cantidad; // Asignamos la cantidad desde el carrito
+              producto.cantidad = cartItem.cantidad;
             } else {
-              producto.cantidad = 0; // Si no está en el carrito, la cantidad es 0
+              producto.cantidad = 0;
             }
 
-            productosArray.push(producto); // Agregamos el producto al array
+            productosArray.push(producto);
           });
 
-          setProductos(productosArray); // Actualizamos el estado con los productos y sus cantidades
+          setProductos(productosArray);
         } else {
           console.log("No hay productos disponibles");
         }
@@ -40,14 +42,17 @@ function Home() {
       .catch((error) => {
         console.error('Error al obtener los productos de Firebase:', error);
       });
-  }, [cartItems]); // Dependemos de `cartItems` para que se actualice cuando cambia el carrito
+  }, [cartItems]);
+
+  // Filtramos los productos usando el searchTerm
+  const productosFiltrados = productos.filter((producto) =>
+    producto.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="container my-5">
       <h2 className="text-center mb-4">Bienvenidos a nuestra tienda</h2>
-
-      {/* Usamos el carrusel con los productos */}
-      <ProductCarousel productos={productos} />
+      <ProductCarousel productos={productosFiltrados} />
     </div>
   );
 }
