@@ -1,11 +1,15 @@
 // src/pages/OrderConfirm.jsx
-import React from 'react';
-import { useCart } from '../context/CartContext'; // Importamos el contexto del carrito
+import React, { useEffect, useState } from "react";
+import { useCart } from "../context/CartContext"; // Importamos el contexto del carrito
 import { useNavigate } from "react-router-dom";
+import { db } from "../firebase"; // Asegúrate de que la ruta sea correcta
+import { ref, get } from "firebase/database"; // Importamos get() para obtener datos de Firebase
 
 function OrderConfirm() {
   const { cartItems, getTotalPrice, clearCart } = useCart(); // Obtenemos los productos del carrito, el precio total y la función para borrar
   const navigate = useNavigate();
+  const [stockAvailability, setStockAvailability] = useState({}); // Estado para almacenar la disponibilidad de stock
+  const [errorMessage, setErrorMessage] = useState(""); // Estado para manejar los mensajes de error
 
   // Función para obtener el tiempo estimado de envío
   const getEstimatedShippingTime = () => {
@@ -29,8 +33,48 @@ function OrderConfirm() {
   // Filtrar los productos con cantidad mayor a 0
   const filteredCartItems = cartItems.filter(item => item.cantidad > 0);
 
+  // Función para comprobar la disponibilidad del stock
+  const checkStockAvailability = async () => {
+    const stockData = {};
+    let hasError = false; // Variable para verificar si hay un error
+
+    for (const item of filteredCartItems) {
+      const productRef = ref(db, `productos/${item.id}/uds`); // Obtener el stock disponible del producto
+      const snapshot = await get(productRef);
+      if (snapshot.exists()) {
+        const stock = snapshot.val();
+        if (item.cantidad > stock) {
+          console.error(`Error: La cantidad solicitada de ${item.nombre} excede el stock disponible. Stock disponible: ${stock}, solicitado: ${item.cantidad}`);
+          hasError = true; // Si hay un error, lo marcamos
+          setErrorMessage(`La cantidad de "${item.nombre}" solicitada excede el stock disponible. Solo quedan ${stock} unidades.`); // Actualizamos el mensaje de error
+        } else {
+          stockData[item.id] = { available: true }; // Si está disponible, lo marcamos
+        }
+      } else {
+        console.error(`Error: No se encontró el producto con ID ${item.id} en la base de datos.`);
+        hasError = true; // Si no se encuentra el producto, lo marcamos como error
+        setErrorMessage("Uno o más productos no se encontraron en la base de datos.");
+      }
+    }
+
+    if (!hasError) {
+      setStockAvailability(stockData); // Si no hubo errores, actualizamos la disponibilidad
+    }
+  };
+
+  useEffect(() => {
+    checkStockAvailability(); // Llamamos a la función para comprobar el stock cuando el carrito cambia
+  }, [cartItems]); // Ejecutamos cuando el carrito cambie
+
   const continuarPedido = () => {
-    navigate("/formulario"); // Redirige al usuario a la página de confirmación de pedido
+    // Verificamos si todos los productos tienen stock disponible antes de continuar
+    const allAvailable = Object.values(stockAvailability).every(stock => stock.available);
+    if (allAvailable) {
+      setErrorMessage(""); // Limpiamos el mensaje de error
+      navigate("/formulario"); // Redirige al usuario a la página de confirmación de pedido
+    } else {
+      console.log("No puedes continuar con el pedido debido a la falta de stock.");
+    }
   };
 
   return (
