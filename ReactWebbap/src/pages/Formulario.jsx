@@ -42,109 +42,88 @@ function OrderForm() {
         setShowModal(false); // Cerrar el modal
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault(); // Evita el comportamiento predeterminado del formulario
 
-        // Comprobar que el carrito no tiene productos con cantidades superiores al stock
         let stockExcedido = false;
         let mensajeError = '';
 
-        // Crear un array de promesas para las validaciones de stock
-        const stockChecks = cartItems.map(item => {
-            const productRef = ref(db, `productos/${item.id}/uds`); // Referencia al stock del producto
-            return get(productRef).then(snapshot => {
+        // 1) Verificar stock antes de proceder
+        for (const item of cartItems) {
+            const productRef = ref(db, `productos/${item.id}/uds`);
+            const snapshot = await get(productRef);
+            if (snapshot.exists()) {
+                const stockActual = snapshot.val();
+                if (item.cantidad > stockActual) {
+                    stockExcedido = true;
+                    mensajeError = `El producto "${item.nombre}" tiene una cantidad superior al stock disponible. Solo hay ${stockActual} unidades disponibles.`;
+                    setSelectedItem({ ...item, stock: stockActual });
+                }
+            }
+        }
+
+        if (stockExcedido) {
+            setShowModal(true);
+            return; // No continuar si hay problema de stock
+        }
+
+        try {
+            // 2) Eliminar datos sensibles antes de subir a Firebase
+            const { tarjeta, cvv, ...formDataWithoutSensitive } = formData;
+
+            // 3) Obtener los detalles de la compra
+            const itemsDetails = cartItems.map(item => ({
+                id: item.id,
+                cantidad: item.cantidad,
+                precio: item.precio,
+                nombre: item.nombre,
+                archivo: item.archivo
+            }));
+
+            // 4) Calcular el tiempo de envío máximo
+            const maxTiempoEnvio = Math.max(...cartItems.map(item => item.tiempoEnv));
+
+            // 5) Crear el objeto de la orden
+            const orderData = {
+                ...formDataWithoutSensitive,
+                userId: userid,
+                items: itemsDetails,
+                totalPrice: getTotalPrice(),
+                tiempoEnvio: maxTiempoEnvio,
+                timestamp: new Date().toISOString(),
+            };
+
+            // 6) Subir la orden a Firebase
+            const orderRef = ref(db, 'orders');
+            const newOrderRef = push(orderRef);
+            await set(newOrderRef, orderData);
+
+            // 7) Actualizar el stock de los productos
+            const updates = {};
+            for (const item of cartItems) {
+                const productRef = ref(db, `productos/${item.id}/uds`);
+                const snapshot = await get(productRef);
                 if (snapshot.exists()) {
                     const stockActual = snapshot.val();
-                    if (item.cantidad > stockActual) {
-                        stockExcedido = true;
-                        mensajeError = `El producto "${item.nombre}" tiene una cantidad superior al stock disponible. Solo hay ${stockActual} unidades disponibles.`;
-                        setSelectedItem({ ...item, stock: stockActual }); // Guardamos el producto con el stock
+                    if (item.cantidad <= stockActual) {
+                        updates[`productos/${item.id}/uds`] = stockActual - item.cantidad;
                     }
                 }
-            });
-        });
+            }
 
-        // Esperar que todas las validaciones de stock terminen antes de continuar
-        Promise.all(stockChecks)
-            .then(() => {
-                // Si alguna cantidad excede el stock, mostramos el mensaje y no procedemos con la compra
-                if (stockExcedido) {
-                    setShowModal(true); // Activa el modal
-                    return; // Evita proceder con el resto del código
-                }
+            // 8) Aplicar las actualizaciones en Firebase
+            await update(ref(db), updates);
 
-                // Eliminar los datos sensibles antes de subir a Firebase
-                const { tarjeta, cvv, ...formDataWithoutSensitive } = formData;
+            // 9) Limpiar el localStorage y vaciar el carrito
+            localStorage.removeItem('orderFormData');
+            clearCart();
+            navigate('/thank-you');
 
-                // Obtener los detalles de la compra
-                const itemsDetails = cartItems.map(item => ({
-                    id: item.id,
-                    cantidad: item.cantidad,
-                    precio: item.precio,
-                    nombre: item.nombre,
-                    archivo: item.archivo
-                }));
-
-                // Calcular el tiempo de envío máximo
-                const maxTiempoEnvio = Math.max(...cartItems.map(item => item.tiempoEnv));
-
-                // Crear el objeto de la orden
-                const orderData = {
-                    ...formDataWithoutSensitive,
-                    userId: userid, // ID del usuario
-                    items: itemsDetails, // Productos comprados
-                    totalPrice: getTotalPrice(), // Precio total de la compra
-                    tiempoEnvio: maxTiempoEnvio, // Tiempo máximo de entrega
-                    timestamp: new Date().toISOString(), // Fecha de la compra
-                };
-
-                // Subir la orden a Firebase
-                const orderRef = ref(db, 'orders'); // Define el path donde se almacenarán los datos
-                const newOrderRef = push(orderRef); // Crea una nueva referencia única para la orden
-
-                set(newOrderRef, orderData) // Sube los datos de la orden a Firebase
-                    .then(() => {
-                        // Ahora actualizamos las unidades de los productos en la base de datos
-                        const updates = [];
-
-                        // Recorremos los productos del carrito y actualizamos el stock
-                        cartItems.forEach(item => {
-                            const productRef = ref(db, `productos/${item.id}/uds`);
-                            get(productRef).then(snapshot => {
-                                if (snapshot.exists()) {
-                                    const stockActual = snapshot.val();
-                                    // Si la cantidad es mayor que el stock disponible, actualizamos el stock
-                                    if (item.cantidad <= stockActual) {
-                                        const newStock = stockActual - item.cantidad;
-                                        updates.push({
-                                            path: `productos/${item.id}/uds`,
-                                            value: newStock
-                                        });
-                                    }
-                                }
-                            });
-                        });
-
-                        // Esperar a que todas las promesas de actualizaciones de stock se resuelvan
-                        return Promise.all(updates.map(update => updateProductStock(update)));
-                    })
-                    .then(() => {
-                        // Borra los datos del formulario del localStorage
-                        localStorage.removeItem('orderFormData');
-                        // Vaciamos el carrito después de que el stock ha sido actualizado
-                        clearCart(); // Borra el carrito
-                        navigate('/thank-you'); // Redirige al usuario a la página de agradecimiento
-                    })
-                    .catch((error) => {
-                        // Manejar errores, si ocurren
-                        console.error("Error al subir la orden o actualizar el stock:", error);
-                    });
-            })
-            .catch((error) => {
-                // Manejar cualquier error en las promesas de validación
-                console.error("Error en las verificaciones de stock:", error);
-            });
+        } catch (error) {
+            console.error("Error al procesar la compra:", error);
+        }
     };
+
 
     return (
         <div className="container my-5">
