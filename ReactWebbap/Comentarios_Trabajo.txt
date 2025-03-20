@@ -1,6 +1,5 @@
 COSAS PENDIENTES:
   - El usuario puede ir manualmente a cualquier página. Sí que es verdad que de ninguna forma le deja hacer una compra si haber pagado. No registra nunca a menos que haya pagado. Podríamos poner algun límite o algo pero no es para nada grave.
-  - Que no se pierda la info del formulario si voy atrás.
   - Librerías extras.
   - Autorellenar correo en el formulario
   - Si me pide iniciar sesión para comprar e inicio en vez de llevarme al home al iniciar tendría que ir a la lista de las cosas
