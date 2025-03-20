@@ -7,7 +7,9 @@ import { onAuthStateChanged } from 'firebase/auth';
 
 function OrderForm() {
     const navigate = useNavigate(); // Hook para manejar la navegación
-    const { cartItems, getTotalPrice, clearCart } = useCart();
+    const { cartItems, getTotalPrice, clearCart, removeFromCart, addToCart } = useCart();
+    const [showModal, setShowModal] = useState(false); // Estado para controlar la visibilidad del modal
+    const [selectedItem, setSelectedItem] = useState(null); // Producto que tiene el problema de stock
     const [formData, setFormData] = useState({
         nombre: '',
         apellidos: '',
@@ -37,92 +39,117 @@ function OrderForm() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    // Función para manejar las acciones del modal (reducir cantidad, eliminar producto, o aceptar)
+    const handleModalAction = (action) => {
+        if (action === 'remove' && selectedItem) {
+            // Eliminar el producto del carrito
+            removeFromCart(selectedItem.id);
+        }
+
+        setShowModal(false); // Cerrar el modal
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault(); // Evita el comportamiento predeterminado del formulario
-
-        // Eliminar los datos sensibles antes de subir a Firebase
-        const { tarjeta, cvv, ...formDataWithoutSensitive } = formData;
-
-        // Obtener los detalles de la compra
-        const itemsDetails = cartItems.map(item => ({
-            id: item.id,
-            cantidad: item.cantidad,
-            precio: item.precio,
-            nombre: item.nombre,
-            archivo: item.archivo
-        }));
-
-        // Calcular el tiempo de envío máximo
-        const maxTiempoEnvio = Math.max(...cartItems.map(item => item.tiempoEnv));
-
-        // Crear el objeto de la orden
-        const orderData = {
-            ...formDataWithoutSensitive,
-            userId: userid, // ID del usuario
-            items: itemsDetails, // Productos comprados
-            totalPrice: getTotalPrice(), // Precio total de la compra
-            tiempoEnvio: maxTiempoEnvio, // Tiempo máximo de entrega
-            timestamp: new Date().toISOString(), // Fecha de la compra
-        };
-
-        // Subir la orden a Firebase
-        const orderRef = ref(db, 'orders'); // Define el path donde se almacenarán los datos
-        const newOrderRef = push(orderRef); // Crea una nueva referencia única para la orden
-
-        set(newOrderRef, orderData) // Sube los datos de la orden a Firebase
+    
+        // Comprobar que el carrito no tiene productos con cantidades superiores al stock
+        let stockExcedido = false;
+        let mensajeError = '';
+    
+        // Crear un array de promesas para las validaciones de stock
+        const stockChecks = cartItems.map(item => {
+            const productRef = ref(db, `productos/${item.id}/uds`); // Referencia al stock del producto
+            return get(productRef).then(snapshot => {
+                if (snapshot.exists()) {
+                    const stockActual = snapshot.val();
+                    if (item.cantidad > stockActual) {
+                        stockExcedido = true;
+                        mensajeError = `El producto "${item.nombre}" tiene una cantidad superior al stock disponible. Solo hay ${stockActual} unidades disponibles.`;
+                        setSelectedItem({ ...item, stock: stockActual }); // Guardamos el producto con el stock
+                    }
+                }
+            });
+        });
+    
+        // Esperar que todas las validaciones de stock terminen antes de continuar
+        Promise.all(stockChecks)
             .then(() => {
-                // Ahora actualizamos las unidades de los productos en la base de datos
-                const updates = [];
-
-                // Recorremos los productos del carrito
-                cartItems.forEach(item => {
-                    const productRef = ref(db, `productos/${item.id}/uds`); // Referencia al stock del producto
-                    updates.push(
-                        get(productRef)  // Obtener las unidades actuales
-                            .then(snapshot => {
+                // Si alguna cantidad excede el stock, mostramos el mensaje y no procedemos con la compra
+                if (stockExcedido) {
+                    setShowModal(true); // Activa el modal
+                    return; // Evita proceder con el resto del código
+                }
+    
+                // Eliminar los datos sensibles antes de subir a Firebase
+                const { tarjeta, cvv, ...formDataWithoutSensitive } = formData;
+    
+                // Obtener los detalles de la compra
+                const itemsDetails = cartItems.map(item => ({
+                    id: item.id,
+                    cantidad: item.cantidad,
+                    precio: item.precio,
+                    nombre: item.nombre,
+                    archivo: item.archivo
+                }));
+    
+                // Calcular el tiempo de envío máximo
+                const maxTiempoEnvio = Math.max(...cartItems.map(item => item.tiempoEnv));
+    
+                // Crear el objeto de la orden
+                const orderData = {
+                    ...formDataWithoutSensitive,
+                    userId: userid, // ID del usuario
+                    items: itemsDetails, // Productos comprados
+                    totalPrice: getTotalPrice(), // Precio total de la compra
+                    tiempoEnvio: maxTiempoEnvio, // Tiempo máximo de entrega
+                    timestamp: new Date().toISOString(), // Fecha de la compra
+                };
+    
+                // Subir la orden a Firebase
+                const orderRef = ref(db, 'orders'); // Define el path donde se almacenarán los datos
+                const newOrderRef = push(orderRef); // Crea una nueva referencia única para la orden
+    
+                set(newOrderRef, orderData) // Sube los datos de la orden a Firebase
+                    .then(() => {
+                        // Ahora actualizamos las unidades de los productos en la base de datos
+                        const updates = [];
+    
+                        // Recorremos los productos del carrito y actualizamos el stock
+                        cartItems.forEach(item => {
+                            const productRef = ref(db, `productos/${item.id}/uds`);
+                            get(productRef).then(snapshot => {
                                 if (snapshot.exists()) {
                                     const stockActual = snapshot.val();
-                                    const nuevoStock = stockActual - item.cantidad; // Restamos las unidades compradas
-                                    // Aseguramos que el stock no sea negativo
-                                    return {
-                                        path: `productos/${item.id}/uds`,
-                                        value: Math.max(nuevoStock, 0),
-                                    };
+                                    // Si la cantidad es mayor que el stock disponible, actualizamos el stock
+                                    if (item.cantidad <= stockActual) {
+                                        const newStock = stockActual - item.cantidad;
+                                        updates.push({
+                                            path: `productos/${item.id}/uds`,
+                                            value: newStock
+                                        });
+                                    }
                                 }
-                            })
-                            .catch((error) => {
-                                console.error("Error al obtener el stock del producto:", error);
-                            })
-                    );
-                });
-
-                // Esperar a que todas las promesas se resuelvan antes de hacer la actualización
-                return Promise.all(updates);
-            })
-            .then(results => {
-                // Realizamos la actualización de los productos en Firebase
-                const updatesObject = {};
-
-                // Llenamos el objeto updatesObject con los resultados obtenidos
-                results.forEach(result => {
-                    if (result) {
-                        updatesObject[result.path] = result.value;
-                    }
-                });
-
-                // Actualizamos el stock de los productos en Firebase
-                return update(ref(db), updatesObject); // Realiza la actualización
-            })
-            .then(() => {
-                // Si la actualización fue exitosa, vaciar el carrito
-                clearCart(); // Borra el carrito
-                navigate('/thank-you'); // Redirige al usuario a la página de agradecimiento
+                            });
+                        });
+    
+                        // Esperar a que todas las promesas de actualizaciones de stock se resuelvan
+                        return Promise.all(updates.map(update => updateProductStock(update)));
+                    })
+                    .then(() => {
+                        // Vaciamos el carrito después de que el stock ha sido actualizado
+                        clearCart(); // Borra el carrito
+                        navigate('/thank-you'); // Redirige al usuario a la página de agradecimiento
+                    })
+                    .catch((error) => {
+                        // Manejar errores, si ocurren
+                        console.error("Error al subir la orden o actualizar el stock:", error);
+                    });
             })
             .catch((error) => {
-                // Manejar errores, si ocurren
-                console.error("Error al subir la orden o actualizar el stock:", error);
+                // Manejar cualquier error en las promesas de validación
+                console.error("Error en las verificaciones de stock:", error);
             });
-    };
+    };    
 
     return (
         <div className="container my-5">
@@ -239,8 +266,33 @@ function OrderForm() {
                     </div>
                 </form>
             </div>
+            {showModal && selectedItem && (
+                <div className="modal" tabIndex="-1" style={{ display: 'block' }}>
+                    <div className="modal-dialog">
+                        <div className="modal-content">
+                            <div className="modal-header">
+                                <h5 className="modal-title">¡Problema con el Stock!</h5>
+                                <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
+                            </div>
+                            <div className="modal-body">
+                                <p>El producto "{selectedItem.nombre}" tiene una cantidad superior al stock disponible.</p>
+                                <p>Solo hay {selectedItem.stock} unidades disponibles.</p>
+                            </div>
+                            <div className="modal-footer">
+                                <button type="button" className="btn btn-danger" onClick={() => handleModalAction('remove')}>
+                                    Eliminar del carrito
+                                </button>
+                                <button type="button" className="btn btn-secondary" onClick={() => setShowModal(false)}>
+                                    Aceptar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
+
 
 export default OrderForm;
