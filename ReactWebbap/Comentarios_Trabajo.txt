@@ -5,7 +5,6 @@ COSAS PENDIENTES:
   - Librerías extras.
   - Autorellenar correo en el formulario
   - Si me pide iniciar sesión para comprar e inicio en vez de llevarme al home al iniciar tendría que ir a la lista de las cosas
-  - Que no deje comprar más unidades que las que hay en stock.
 
 ESPECIFICACIONES QUE FALTAN POR HACER:
 Desplegar el proyecto una vez acabado.
