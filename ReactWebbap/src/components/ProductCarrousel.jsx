@@ -124,7 +124,7 @@ function ProductCarousel({ productos }) {
                               className="img-responsive w-80"
                             />
                           </div>
-                          <div className="thumb-content text-center">
+                          <div className="thumb-content text-center d-flex flex-column flex-grow-1">
                             <h4>{producto.nombre}</h4>
                             <div className="star-rating">
                               <ul className="list-inline">
@@ -141,7 +141,7 @@ function ProductCarousel({ productos }) {
                               <b>€{producto.precio}</b>
                             </p>
                             {/* Controles de cantidad */}
-                            <div className="d-flex justify-content-center align-items-center contador-container bg-light p-2 rounded">
+                            <div className="d-flex justify-content-center align-items-center contador-container bg-light p-2 rounded mt-auto">
                               <button
                                 className="btn btn-danger mx-2"
                                 onClick={() => handleDecrement(producto.id)}
