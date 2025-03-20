@@ -9,6 +9,7 @@ function ProductCarousel({ productos }) {
   const [activeIndex] = useState(0);
   const [itemsPerRow, setItemsPerRow] = useState(getItemsPerRow());
   const [cantidadProductos, setCantidadProductos] = useState({});
+  const [showModal, setShowModal] = useState(false); // Estado para controlar la modal
 
   // Función para actualizar la cantidad de productos por fila
   useEffect(() => {
@@ -36,17 +37,21 @@ function ProductCarousel({ productos }) {
 
   const productChunks = chunkArray(productos, itemsPerRow);
 
-  // handleIncrement para aumentar la cantidad del producto
+  // handleIncrement para aumentar la cantidad del producto sin exceder el límite de stock
   const handleIncrement = useCallback((id) => {
-    // Encontramos el producto en el carrito
     const cartProduct = cartItems.find(item => item.id === id);
-    const currentQuantity = cartProduct ? cartProduct.cantidad : 0; // Si existe en el carrito, usamos su cantidad
-  
+    const currentQuantity = cartProduct ? cartProduct.cantidad : 0;
+    const product = productos.find(p => p.id === id);
+
+    // Si la cantidad ya es igual o mayor al stock, no hacer nada
+    if (currentQuantity >= product.uds) {
+      return;
+    }
+
     // Incrementamos la cantidad
     setCantidadProductos((prev) => {
       const newCantidad = currentQuantity + 1;
-      const product = productos.find(p => p.id === id);
-  
+
       addToCart({
         id: product.id,
         nombre: product.nombre,
@@ -56,22 +61,22 @@ function ProductCarousel({ productos }) {
         tiempoEnv: product.tiempoEnv,
         uds: product.uds,
       });
-  
+
       return { ...prev, [id]: newCantidad };
     });
   }, [productos, addToCart, cartItems]);
-  
+
   // handleDecrement para disminuir la cantidad del producto
   const handleDecrement = useCallback((id) => {
     // Encontramos el producto en el carrito
     const cartProduct = cartItems.find(item => item.id === id);
     const currentQuantity = cartProduct ? cartProduct.cantidad : 0; // Si existe en el carrito, usamos su cantidad
-  
+
     // Decrementamos la cantidad, pero no permitimos valores negativos
     setCantidadProductos((prev) => {
       const newCantidad = Math.max(currentQuantity - 1, 0); // Si ya está en 0, no decrementar más
       const product = productos.find(p => p.id === id);
-  
+
       addToCart({
         id: product.id,
         nombre: product.nombre,
@@ -81,11 +86,11 @@ function ProductCarousel({ productos }) {
         tiempoEnv: product.tiempoEnv,
         uds: product.uds,
       });
-  
+
       return { ...prev, [id]: newCantidad };
     });
   }, [productos, addToCart, cartItems]);
-  
+
 
   return (
     <div className="container">
@@ -132,6 +137,8 @@ function ProductCarousel({ productos }) {
                                 onClick={() => handleDecrement(producto.id)}
                                 onMouseUp={(e) => e.currentTarget.blur()}
                                 onBlur={(e) => e.currentTarget.blur()}
+                                
+                                disabled={producto.cantidad <= 0}
                               >
                                 −
                               </button>
