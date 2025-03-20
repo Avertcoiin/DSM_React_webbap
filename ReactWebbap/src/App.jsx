@@ -13,28 +13,31 @@ import Register from './pages/Register'; // Importa la nueva página de Register
 import BorrarUsuario from './pages/BorrarUsuario'; // Importa la nueva página de BorrarUsuario
 import { CartProvider } from './context/CartContext'; // Importa el CartProvider
 import { SearchProvider } from './context/SearchContext'; // Importa el SearchProvider
+import { OrderFormProvider } from './context/OrderFormContext'; // Importa el OrderFormProvider
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   return (
     <CartProvider>
       <SearchProvider>
-        <div className='d-flex flex-column min-vh-100'>
-          <Header />
-          <div className="flex-grow-1 pt-5">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/order-confirm" element={<OrderConfirm />} />
-              <Route path="/formulario" element={<Formulario />} />
-              <Route path="/thank-you" element={<ThankYou />} />
-              <Route path='/login' element={<Login />} />
-              <Route path='/pedidos' element={<Pedidos />} />
-              <Route path='/register' element={<Register />} />
-              <Route path='/borrar-usuario' element={<BorrarUsuario />} />
-            </Routes>
+        <OrderFormProvider> {/* Envuelve la aplicación con el OrderFormProvider */}
+          <div className='d-flex flex-column min-vh-100'>
+            <Header />
+            <div className="flex-grow-1 pt-5">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/order-confirm" element={<OrderConfirm />} />
+                <Route path="/formulario" element={<Formulario />} />
+                <Route path="/thank-you" element={<ThankYou />} />
+                <Route path='/login' element={<Login />} />
+                <Route path='/pedidos' element={<Pedidos />} />
+                <Route path='/register' element={<Register />} />
+                <Route path='/borrar-usuario' element={<BorrarUsuario />} />
+              </Routes>
+            </div>
+            <Footer />
           </div>
-          <Footer />
-        </div>
+        </OrderFormProvider> {/* Cierra el OrderFormProvider */}
       </SearchProvider>
     </CartProvider>
   );

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useCart } from '../context/CartContext'; // Asegúrate de que esta importación esté correcta
+import { useOrderForm } from '../context/OrderFormContext'; // Usa el contexto para el formulario
 import { useNavigate } from 'react-router-dom'; // Para la navegación
 import { db, auth } from '../firebase'; // Importa la instancia de la base de datos
 import { ref, set, push, get, update } from "firebase/database"; // Importa las funciones de Firebase
@@ -10,15 +11,7 @@ function OrderForm() {
     const { cartItems, getTotalPrice, clearCart, removeFromCart, addToCart } = useCart();
     const [showModal, setShowModal] = useState(false); // Estado para controlar la visibilidad del modal
     const [selectedItem, setSelectedItem] = useState(null); // Producto que tiene el problema de stock
-    const [formData, setFormData] = useState({
-        nombre: '',
-        apellidos: '',
-        telefono: '',
-        correo: '',
-        tarjeta: '',
-        cvv: '',
-        direccion: ''
-    });
+    const { formData, setFormData } = useOrderForm();
 
     // capturar el id del usuario
     const [userid, setUserid] = useState(null);
@@ -51,11 +44,11 @@ function OrderForm() {
 
     const handleSubmit = (e) => {
         e.preventDefault(); // Evita el comportamiento predeterminado del formulario
-    
+
         // Comprobar que el carrito no tiene productos con cantidades superiores al stock
         let stockExcedido = false;
         let mensajeError = '';
-    
+
         // Crear un array de promesas para las validaciones de stock
         const stockChecks = cartItems.map(item => {
             const productRef = ref(db, `productos/${item.id}/uds`); // Referencia al stock del producto
@@ -70,7 +63,7 @@ function OrderForm() {
                 }
             });
         });
-    
+
         // Esperar que todas las validaciones de stock terminen antes de continuar
         Promise.all(stockChecks)
             .then(() => {
@@ -79,10 +72,10 @@ function OrderForm() {
                     setShowModal(true); // Activa el modal
                     return; // Evita proceder con el resto del código
                 }
-    
+
                 // Eliminar los datos sensibles antes de subir a Firebase
                 const { tarjeta, cvv, ...formDataWithoutSensitive } = formData;
-    
+
                 // Obtener los detalles de la compra
                 const itemsDetails = cartItems.map(item => ({
                     id: item.id,
@@ -91,10 +84,10 @@ function OrderForm() {
                     nombre: item.nombre,
                     archivo: item.archivo
                 }));
-    
+
                 // Calcular el tiempo de envío máximo
                 const maxTiempoEnvio = Math.max(...cartItems.map(item => item.tiempoEnv));
-    
+
                 // Crear el objeto de la orden
                 const orderData = {
                     ...formDataWithoutSensitive,
@@ -104,16 +97,16 @@ function OrderForm() {
                     tiempoEnvio: maxTiempoEnvio, // Tiempo máximo de entrega
                     timestamp: new Date().toISOString(), // Fecha de la compra
                 };
-    
+
                 // Subir la orden a Firebase
                 const orderRef = ref(db, 'orders'); // Define el path donde se almacenarán los datos
                 const newOrderRef = push(orderRef); // Crea una nueva referencia única para la orden
-    
+
                 set(newOrderRef, orderData) // Sube los datos de la orden a Firebase
                     .then(() => {
                         // Ahora actualizamos las unidades de los productos en la base de datos
                         const updates = [];
-    
+
                         // Recorremos los productos del carrito y actualizamos el stock
                         cartItems.forEach(item => {
                             const productRef = ref(db, `productos/${item.id}/uds`);
@@ -131,11 +124,13 @@ function OrderForm() {
                                 }
                             });
                         });
-    
+
                         // Esperar a que todas las promesas de actualizaciones de stock se resuelvan
                         return Promise.all(updates.map(update => updateProductStock(update)));
                     })
                     .then(() => {
+                        // Borra los datos del formulario del localStorage
+                        localStorage.removeItem('orderFormData');
                         // Vaciamos el carrito después de que el stock ha sido actualizado
                         clearCart(); // Borra el carrito
                         navigate('/thank-you'); // Redirige al usuario a la página de agradecimiento
@@ -149,7 +144,7 @@ function OrderForm() {
                 // Manejar cualquier error en las promesas de validación
                 console.error("Error en las verificaciones de stock:", error);
             });
-    };    
+    };
 
     return (
         <div className="container my-5">
