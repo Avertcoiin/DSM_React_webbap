@@ -6,6 +6,7 @@ import logo from "../../assets/logo.png";
 import carrito from "../../assets/carrito.jpg";
 import { useCart } from "../../context/CartContext";
 import { useSearch } from "../../context/SearchContext";
+import { useRoute } from "../../context/RouteContext"; // Importar useRoute
 import { Dropdown } from "react-bootstrap";
 
 function Header() {
@@ -13,6 +14,7 @@ function Header() {
   const location = useLocation();
   const { cartItems, getTotalPrice } = useCart();
   const { searchTerm, setSearchTerm } = useSearch();
+  const { setDesiredRoute } = useRoute();
   const [user, setUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState(searchTerm);
   const prevLocationRef = useRef(location.pathname); // Usamos useRef para almacenar la ruta anterior
@@ -40,7 +42,12 @@ function Header() {
 
   const handleOrderClick = () => {
     if (!user) {
-      navigate("/login");
+      if (location.pathname === "/login") {
+        navigate("/");
+      }else{
+        setDesiredRoute("/order-confirm");
+        navigate("/login");
+      }
     } else if (location.pathname === "/" ) {
       navigate("/order-confirm");
     } else if (location.pathname === "/thank-you" || prevLocationRef.current === location.pathname) {
