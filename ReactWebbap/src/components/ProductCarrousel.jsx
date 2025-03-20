@@ -5,10 +5,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 
 function ProductCarousel({ productos }) {
-  const { addToCart, cartItems} = useCart(); // Accedemos al método getTotalPrice del contexto
+  const { addToCart, cartItems } = useCart(); // Accedemos al método getTotalPrice del contexto
   const [activeIndex] = useState(0);
   const [itemsPerRow, setItemsPerRow] = useState(getItemsPerRow());
-  const [setCantidadProductos] = useState({});
+  const [cantidadProductos, setCantidadProductos] = useState({});
   const [showModal, setShowModal] = useState(false); // Estado para controlar la modal
   const [productoAlcanzado, setProductoAlcanzado] = useState(null); // Estado para el producto con límite alcanzado
 
@@ -42,7 +42,7 @@ function ProductCarousel({ productos }) {
     setShowModal(false);
     setProductoAlcanzado(null); // Resetear el producto alcanzado
   };
-  
+
 
   // handleIncrement para aumentar la cantidad del producto sin exceder el límite de stock
   const handleIncrement = useCallback((id) => {
@@ -147,7 +147,6 @@ function ProductCarousel({ productos }) {
                                 onClick={() => handleDecrement(producto.id)}
                                 onMouseUp={(e) => e.currentTarget.blur()}
                                 onBlur={(e) => e.currentTarget.blur()}
-
                                 disabled={producto.cantidad <= 0}
                               >
                                 −
@@ -184,7 +183,7 @@ function ProductCarousel({ productos }) {
                 <h5 className="modal-title" id="exampleModalLabel">¡Atención!</h5>
               </div>
               <div className="modal-body">
-                Has alcanzado el límite de unidades disponibles del el producto <strong>{productoAlcanzado?.nombre}</strong>.
+                Has alcanzado el límite de unidades disponibles del producto <strong>{productoAlcanzado?.nombre}</strong>.
               </div>
               <div className="modal-footer">
                 <button type="button" className="btn btn-primary" onClick={closeModal}>Aceptar</button>
