@@ -2,6 +2,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter as Router } from 'react-router-dom'; // Importar BrowserRouter
+import { RouteProvider } from './context/RouteContext'; // Importar el RouteProvider
 import App from './App';
 import './index.css'; // Si tienes un archivo de estilos
 import 'bootstrap/dist/css/bootstrap.min.css';  // Importar los estilos de Bootstrap
@@ -12,8 +13,10 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
   <React.StrictMode>
-    <Router> {/* Envolvemos la app completa en BrowserRouter */}
-      <App />
-    </Router>
+    <RouteProvider>
+      <Router> {/* Envolvemos la app completa en BrowserRouter */}
+        <App />
+      </Router>
+    </RouteProvider>
   </React.StrictMode>
 );

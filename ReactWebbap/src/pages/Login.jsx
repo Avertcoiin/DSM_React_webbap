@@ -2,18 +2,21 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase"; // Asegúrate de que la ruta sea correcta
+import { useRoute } from "../context/RouteContext";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { desiredRoute, setDesiredRoute } = useRoute();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async (event) => {
+    event.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate("/"); // Redirige al usuario a la página de inicio después del login
+      navigate(desiredRoute || "/");
+      setDesiredRoute(null); // Limpiar la ruta deseada después de redirigir
     } catch (error) {
       setError(error.message);
     }

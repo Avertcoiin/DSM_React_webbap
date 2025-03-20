@@ -1,6 +1,6 @@
 // src/App.jsx
 import React, { useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, RouterProvider } from 'react-router-dom';
 import Home from './pages/Home'; // Página principal
 import Footer from './components/ui/Footer';
 import Header from './components/ui/Header';
@@ -14,13 +14,14 @@ import BorrarUsuario from './pages/BorrarUsuario'; // Importa la nueva página d
 import { CartProvider } from './context/CartContext'; // Importa el CartProvider
 import { SearchProvider } from './context/SearchContext'; // Importa el SearchProvider
 import { OrderFormProvider } from './context/OrderFormContext'; // Importa el OrderFormProvider
+import { RouteProvider } from './context/RouteContext.jsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   return (
     <CartProvider>
       <SearchProvider>
-        <OrderFormProvider> {/* Envuelve la aplicación con el OrderFormProvider */}
+        <OrderFormProvider>
           <div className='d-flex flex-column min-vh-100'>
             <Header />
             <div className="flex-grow-1 pt-5">
@@ -37,7 +38,7 @@ function App() {
             </div>
             <Footer />
           </div>
-        </OrderFormProvider> {/* Cierra el OrderFormProvider */}
+        </OrderFormProvider> 
       </SearchProvider>
     </CartProvider>
   );
