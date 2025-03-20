@@ -13,13 +13,15 @@ import Register from './pages/Register'; // Importa la nueva página de Register
 import BorrarUsuario from './pages/BorrarUsuario'; // Importa la nueva página de BorrarUsuario
 import { CartProvider } from './context/CartContext'; // Importa el CartProvider
 import { SearchProvider } from './context/SearchContext'; // Importa el SearchProvider
+import { OrderFormProvider } from './context/OrderFormContext'; // Importa el OrderFormProvider
 import { RouteProvider } from './context/RouteContext.jsx';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   return (
-      <CartProvider>
-        <SearchProvider>
+    <CartProvider>
+      <SearchProvider>
+        <OrderFormProvider>
           <div className='d-flex flex-column min-vh-100'>
             <Header />
             <div className="flex-grow-1 pt-5">
@@ -36,8 +38,9 @@ function App() {
             </div>
             <Footer />
           </div>
-        </SearchProvider>
-      </CartProvider>
+        </OrderFormProvider> 
+      </SearchProvider>
+    </CartProvider>
   );
 }
 
