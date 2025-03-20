@@ -117,7 +117,7 @@ function ProductCarousel({ productos }) {
                         key={producto.id}
                         className={`col-${12 / itemsPerRow} d-flex align-items-stretch mb-4`}
                       >
-                        <div className="thumb-wrapper w-100">
+                        <div className="thumb-wrapper w-100 d-flex flex-column h-100">
                           <div className="img-box">
                             <img
                               src={producto.archivo} //"src/assets/jarron1.webp" 
