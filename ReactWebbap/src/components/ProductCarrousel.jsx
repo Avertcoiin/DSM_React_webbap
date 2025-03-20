@@ -5,10 +5,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 
 function ProductCarousel({ productos }) {
-  const { addToCart, cartItems, getTotalPrice } = useCart(); // Accedemos al método getTotalPrice del contexto
+  const { addToCart, cartItems} = useCart(); // Accedemos al método getTotalPrice del contexto
   const [activeIndex] = useState(0);
   const [itemsPerRow, setItemsPerRow] = useState(getItemsPerRow());
-  const [cantidadProductos, setCantidadProductos] = useState({});
+  const [setCantidadProductos] = useState({});
   const [showModal, setShowModal] = useState(false); // Estado para controlar la modal
   const [productoAlcanzado, setProductoAlcanzado] = useState(null); // Estado para el producto con límite alcanzado
 
