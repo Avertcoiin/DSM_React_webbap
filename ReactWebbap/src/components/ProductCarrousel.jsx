@@ -1,7 +1,7 @@
 // src/components/ProductCarrousel.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useCart } from '../context/CartContext';
-import Conversion from './Conversion';
+import { useConversion } from '../context/ConversionContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 
@@ -12,7 +12,7 @@ function ProductCarousel({ productos }) {
   const [cantidadProductos, setCantidadProductos] = useState({});
   const [showModal, setShowModal] = useState(false); // Estado para controlar la modal
   const [productoAlcanzado, setProductoAlcanzado] = useState(null); // Estado para el producto con límite alcanzado
-  const { rates, loading, error } = Conversion(); 
+  const { conversionRate, currencySymbol } = useConversion();
 
   // Función para actualizar la cantidad de productos por fila
   useEffect(() => {
@@ -45,6 +45,10 @@ function ProductCarousel({ productos }) {
     setProductoAlcanzado(null); // Resetear el producto alcanzado
   };
 
+  // Función para obtener el precio convertido
+  const getConvertedPrice = (price) => {
+    return price * conversionRate; // Multiplicamos el precio por la tasa de conversión
+  };
 
   // handleIncrement para aumentar la cantidad del producto sin exceder el límite de stock
   const handleIncrement = useCallback((id) => {
@@ -140,7 +144,7 @@ function ProductCarousel({ productos }) {
                               </ul>
                             </div>
                             <p className="item-price">
-                              <b>€{producto.precio}</b>
+                              <b>{currencySymbol}{getConvertedPrice(producto.precio).toFixed(2)}</b>
                             </p>
                             {/* Controles de cantidad */}
                             <div className="d-flex justify-content-center align-items-center contador-container bg-light p-2 rounded mt-auto">

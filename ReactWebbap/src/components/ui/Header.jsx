@@ -7,6 +7,7 @@ import carrito from "../../assets/carrito.jpg";
 import { useCart } from "../../context/CartContext";
 import { useSearch } from "../../context/SearchContext";
 import { useRoute } from "../../context/RouteContext"; // Importar useRoute
+import { useConversion } from "../../context/ConversionContext"; // Importamos el contexto
 import { Dropdown } from "react-bootstrap";
 import currency from "currency.js"; // Importamos currency.js
 import Conversion from "../Conversion"; // Importamos el hook
@@ -24,6 +25,7 @@ function Header() {
   const [selectedCountry, setSelectedCountry] = useState("EU");
   const prevLocationRef = useRef(location.pathname); // Usamos useRef para almacenar la ruta anterior
   const { rates, loading, error } = Conversion(); // Usamos el hook actualizado
+  const { updateConversion } = useConversion();
 
   // Definir los países, monedas y banderas
   const countries = [
@@ -34,9 +36,20 @@ function Header() {
   ];
 
   // Función para manejar la selección del país
-  const handleCountryChange = (selectedOption) => {
+  /* const handleCountryChange = (selectedOption) => {
     setSelectedCountry(selectedOption.value);
+  }; */
+  const handleCountryChange = (selectedOption) => {
+    setSelectedCountry(selectedOption.value); // Actualizamos el país seleccionado
+  
+    // Actualizamos la moneda y el factor de conversión
+    const country = countries.find((c) => c.value === selectedOption.value);
+    if (country) {
+      const conversionRate = rates[country.currency]; // Obtenemos la tasa de conversión de la moneda seleccionada
+      updateConversion(country.currency, conversionRate); // Llamamos a la función de actualización del contexto
+    }
   };
+
 
   // Función para obtener el precio total formateado con la moneda seleccionada
   const getFormattedPrice = (price) => {

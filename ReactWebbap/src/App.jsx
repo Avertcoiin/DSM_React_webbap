@@ -15,10 +15,12 @@ import { CartProvider } from './context/CartContext'; // Importa el CartProvider
 import { SearchProvider } from './context/SearchContext'; // Importa el SearchProvider
 import { OrderFormProvider } from './context/OrderFormContext'; // Importa el OrderFormProvider
 import { RouteProvider } from './context/RouteContext.jsx';
+import { ConversionProvider } from "./context/ConversionContext";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
   return (
+    <ConversionProvider>
     <CartProvider>
       <SearchProvider>
         <OrderFormProvider>
@@ -41,6 +43,7 @@ function App() {
         </OrderFormProvider> 
       </SearchProvider>
     </CartProvider>
+    </ConversionProvider>
   );
 }
 
