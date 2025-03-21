@@ -8,6 +8,8 @@ import { useCart } from "../../context/CartContext";
 import { useSearch } from "../../context/SearchContext";
 import { useRoute } from "../../context/RouteContext"; // Importar useRoute
 import { Dropdown } from "react-bootstrap";
+import currency from "currency.js"; // Importamos currency.js
+import Conversion from "../Conversion"; // Importamos el hook
 
 function Header() {
   const navigate = useNavigate();
@@ -17,8 +19,50 @@ function Header() {
   const { setDesiredRoute } = useRoute();
   const [user, setUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState(searchTerm);
+  const [selectedCountry, setSelectedCountry] = useState("EU");
   const prevLocationRef = useRef(location.pathname); // Usamos useRef para almacenar la ruta anterior
+  const { rates, loading, error } = Conversion(); // Usamos el hook actualizado
 
+  // Definir los países y sus monedas
+  const countries = [
+    { name: "España", code: "EU", currency: "EUR" },
+    { name: "Estados Unidos", code: "US", currency: "USD" },
+    { name: "Reino Unido", code: "GB", currency: "GBP" },
+    { name: "Canadá", code: "CA", currency: "CAD" },
+  ];
+
+  // Función para manejar la selección del país
+  const handleCountryChange = (countryCode) => {
+    setSelectedCountry(countryCode);
+  };
+
+  // Función para obtener el precio total formateado con la moneda seleccionada
+  const getFormattedPrice = (price) => {
+    if (loading) return "Cargando..."; // Mostramos un mensaje mientras se cargan las tasas
+    if (error) return "Error al cargar tasas de cambio"; // Mostramos un mensaje si hubo un error
+
+    const country = countries.find((c) => c.code === selectedCountry);
+    if (country) {
+      // Usamos las tasas de conversión reales obtenidas
+      const conversionRate = rates[country.currency]; // Obtenemos la tasa de conversión
+      if (conversionRate) {
+        const convertedPrice = currency(price).multiply(conversionRate); // Multiplicamos el precio
+        return convertedPrice.value.toFixed(2); // Retornamos el valor formateado sin el símbolo de moneda
+      }
+    }
+    return currency(price).value.toFixed(2); // Si no se encuentra, devuelve el precio en euros
+  };
+
+  // Función para obtener el símbolo de la moneda
+  const getCurrencySymbol = (currencyCode) => {
+    const currencySymbols = {
+      EUR: "€",
+      USD: "$",
+      GBP: "£",
+      CAD: "C$",
+    };
+    return currencySymbols[currencyCode] || "";
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -38,29 +82,29 @@ function Header() {
   }, [location.pathname]);
 
   const totalCantidad = cartItems.reduce((acc, item) => acc + item.cantidad, 0);
-  const totalPrecio = getTotalPrice();
+  const totalPrecio = getTotalPrice(); // Precio total en euros
 
   const handleOrderClick = () => {
     if (!user) {
       if (location.pathname === "/login") {
-        navigate("/");
-      }else{
+        navigate("/"); // Redirigimos a inicio si no hay usuario
+      } else {
         setDesiredRoute("/order-confirm");
         navigate("/login");
       }
-    } else if (location.pathname === "/" ) {
-      navigate("/order-confirm");
+    } else if (location.pathname === "/") {
+      navigate("/order-confirm"); // Confirmamos pedido si estamos en la página principal
     } else if (location.pathname === "/thank-you" || prevLocationRef.current === location.pathname) {
-      navigate("/");
+      navigate("/"); // Volvemos al inicio
     } else {
-      navigate(-1);
+      navigate(-1); // Regresamos a la página anterior
     }
   };
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigate("/");
+      navigate("/"); // Logout y redirigir al inicio
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
     }
@@ -87,7 +131,8 @@ function Header() {
           </span>
         </div>
         <div className="total mx-3 text-light">
-          <span>Total: {totalPrecio.toFixed(2)}€</span>
+          {/* Aquí concatenamos el símbolo de la moneda antes del precio */}
+          <span>Total: {getCurrencySymbol(countries.find((c) => c.code === selectedCountry)?.currency)} {getFormattedPrice(totalPrecio)}</span>
         </div>
         <div className="session-order mx-3">
           <button className="btn btn-success" onClick={handleOrderClick}>
@@ -111,6 +156,15 @@ function Header() {
               <i className="bi bi-person-circle"></i> Iniciar Sesión
             </button>
           )}
+        </div>
+        <div className="country-select mx-3">
+          <select className="form-control" onChange={(e) => handleCountryChange(e.target.value)} value={selectedCountry}>
+            {countries.map((country) => (
+              <option key={country.code} value={country.code}>
+                {country.name}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
     </header>

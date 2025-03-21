@@ -1,6 +1,7 @@
 // src/components/ProductCarrousel.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useCart } from '../context/CartContext';
+import Conversion from './Conversion';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.min.css';
 
@@ -11,6 +12,7 @@ function ProductCarousel({ productos }) {
   const [cantidadProductos, setCantidadProductos] = useState({});
   const [showModal, setShowModal] = useState(false); // Estado para controlar la modal
   const [productoAlcanzado, setProductoAlcanzado] = useState(null); // Estado para el producto con límite alcanzado
+  const { rates, loading, error } = Conversion(); 
 
   // Función para actualizar la cantidad de productos por fila
   useEffect(() => {

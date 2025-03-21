@@ -12,10 +12,11 @@
   "dependencies": {
     "@tsparticles/engine": "^3.8.1",
     "animate.css": "^4.1.1",
-    "axios": "^1.8.1",
+    "axios": "^1.8.4",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "crypto-js": "^4.2.0",
+    "currency.js": "^2.0.4",
     "firebase": "^11.4.0",
     "fireworks-js": "^2.10.8",
     "font-awesome": "^4.7.0",
@@ -31,6 +32,7 @@
     "react-router-dom": "^6.30.0",
     "react-select": "^5.10.1",
     "react-tsparticles": "^2.12.2",
+    "react-world-flags": "^1.6.0",
     "tsparticles": "^3.8.1"
   },
   "devDependencies": {
