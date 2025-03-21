@@ -27,7 +27,7 @@ function Header() {
 
   // Definir los países, monedas y banderas
   const countries = [
-    { label: "España", value: "EU", currency: "EUR", flag: "EU" },
+    { label: "España", value: "EU", currency: "EUR", flag: "ES" },
     { label: "Estados Unidos", value: "US", currency: "USD", flag: "US" },
     { label: "Reino Unido", value: "GB", currency: "GBP", flag: "GB" },
     { label: "Canadá", value: "CA", currency: "CAD", flag: "CA" },
@@ -49,10 +49,10 @@ function Header() {
       const conversionRate = rates[country.currency]; // Obtenemos la tasa de conversión
       if (conversionRate) {
         const convertedPrice = currency(price).multiply(conversionRate); // Multiplicamos el precio
-        return convertedPrice.format(); // Retornamos el precio formateado con el símbolo de moneda
+        return convertedPrice.value; // Retornamos solo el valor numérico
       }
     }
-    return currency(price).format(); // Si no se encuentra, devuelve el precio en euros
+    return currency(price).value; // Si no se encuentra, devuelve el valor en euros
   };
 
   // Función para obtener el símbolo de la moneda
@@ -133,7 +133,10 @@ function Header() {
           </span>
         </div>
         <div className="total mx-3 text-light">
-          <span>Total: {getCurrencySymbol(countries.find((c) => c.value === selectedCountry)?.currency)} {getFormattedPrice(totalPrecio)}</span>
+          <span>
+            Total: {getCurrencySymbol(countries.find((c) => c.value === selectedCountry)?.currency)}{" "}
+            {getFormattedPrice(totalPrecio)}
+          </span>
         </div>
         <div className="session-order mx-3">
           <button className="btn btn-success" onClick={handleOrderClick}>
