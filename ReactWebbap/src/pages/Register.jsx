@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase"; // Asegúrate de que la ruta sea correcta
+import { MDBBtn, MDBContainer, MDBRow, MDBCol, MDBInput } from 'mdb-react-ui-kit';
+import logo from "../assets/logo_invert.png";
 
 function Register() {
   const [email, setEmail] = useState("");
@@ -25,48 +27,57 @@ function Register() {
   };
 
   return (
-    <div className="container mt-5">
-      <h2>Registro</h2>
-      <form onSubmit={handleRegister}>
-        <div className="mb-3">
-          <label htmlFor="email" className="form-label">Email</label>
-          <input
+    <MDBContainer
+      fluid
+      className="d-flex align-items-center justify-content-center"
+      style={{ minHeight: "100vh", backgroundColor: "#f0f2f5" }}
+    >
+      <div
+        className="p-4 rounded shadow"
+        style={{
+          width: "33%",
+          backgroundColor: "rgba(255, 255, 255, 0.95)",
+        }}
+      >
+        <div className="text-center mb-4">
+          <img src={logo} style={{ width: '150px' }} alt="logo" />
+          <h4 className="mt-3">Regístrate en nuestra plataforma</h4>
+        </div>
+
+        <form onSubmit={handleRegister}>
+          <MDBInput
+            wrapperClass="mb-4"
+            label="Dirección de correo electrónico"
             type="email"
-            className="form-control"
-            id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-        </div>
-        <div className="mb-3">
-          <label htmlFor="password" className="form-label">Contraseña</label>
-          <input
+          <MDBInput
+            wrapperClass="mb-4"
+            label="Contraseña"
             type="password"
-            className="form-control"
-            id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-        </div>
-        <div className="mb-3">
-          <label htmlFor="confirmPassword" className="form-label">Confirmar Contraseña</label>
-          <input
+          <MDBInput
+            wrapperClass="mb-4"
+            label="Confirmar contraseña"
             type="password"
-            className="form-control"
-            id="confirmPassword"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
           />
-        </div>
-        {error && <div className="alert alert-danger">{error}</div>}
-        <div className="mb-3">
-            <button type="submit" className="btn btn-primary">Registrarse</button>
-        </div>
-      </form>
-    </div>
+
+          {error && <div className="alert alert-danger">{error}</div>}
+
+          <div className="text-center mb-4">
+            <MDBBtn className="w-100">Regístrate</MDBBtn>
+          </div>
+        </form>
+      </div>
+    </MDBContainer>
   );
 }
 

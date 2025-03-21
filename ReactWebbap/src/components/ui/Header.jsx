@@ -35,10 +35,6 @@ function Header() {
     { label: "Canadá", value: "CA", currency: "CAD", flag: "CA" },
   ];
 
-  // Función para manejar la selección del país
-  /* const handleCountryChange = (selectedOption) => {
-    setSelectedCountry(selectedOption.value);
-  }; */
   const handleCountryChange = (selectedOption) => {
     setSelectedCountry(selectedOption.value); // Actualizamos el país seleccionado
   
