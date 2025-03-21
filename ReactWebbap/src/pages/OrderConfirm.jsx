@@ -4,12 +4,16 @@ import { useCart } from "../context/CartContext"; // Importamos el contexto del 
 import { useNavigate } from "react-router-dom";
 import { db } from "../firebase"; // Asegúrate de que la ruta sea correcta
 import { ref, get } from "firebase/database"; // Importamos get() para obtener datos de Firebase
+import { useConversion } from "../context/ConversionContext"; // Asegúrate de importar el hook del contexto
+
 
 function OrderConfirm() {
   const { cartItems, getTotalPrice, clearCart } = useCart(); // Obtenemos los productos del carrito, el precio total y la función para borrar
   const navigate = useNavigate();
   const [stockAvailability, setStockAvailability] = useState({}); // Estado para almacenar la disponibilidad de stock
   const [errorMessage, setErrorMessage] = useState(""); // Estado para manejar los mensajes de error
+  const { conversionRate, currencySymbol } = useConversion(); // Obtener el rate de conversión y símbolo
+
 
   // Función para obtener el tiempo estimado de envío
   const getEstimatedShippingTime = () => {
@@ -32,6 +36,12 @@ function OrderConfirm() {
 
   // Filtrar los productos con cantidad mayor a 0
   const filteredCartItems = cartItems.filter(item => item.cantidad > 0);
+
+  // Función para obtener el precio convertido
+  const getConvertedPrice = (price) => {
+    return price * conversionRate; // Multiplicamos el precio por la tasa de conversión
+  };
+
 
   // Función para comprobar la disponibilidad del stock
   const checkStockAvailability = async () => {
@@ -113,7 +123,7 @@ function OrderConfirm() {
                         {/* Nombre del producto a la izquierda */}
                         <h5 className="mb-0">{item.nombre}</h5>
                         {/* Precio del producto a la derecha */}
-                        <p className="fw-bold fs-5 mb-0">{item.precio}€</p>
+                        <p className="fw-bold fs-5 mb-0">{currencySymbol}{getConvertedPrice(item.precio).toFixed(2)}</p>
                       </div>
                       <p className="mb-0">Cantidad: {item.cantidad}</p>
 
@@ -141,14 +151,14 @@ function OrderConfirm() {
                   {cartItems.map((item) => (
                     <li key={item.id} className="list-group-item d-flex justify-content-between">
                       <span>{item.nombre}</span>
-                      <span>{(item.precio * item.cantidad).toFixed(2)}€</span>
+                      <span>{currencySymbol}{getConvertedPrice(item.precio * item.cantidad).toFixed(2)}</span>
                     </li>
                   ))}
                 </ul>
 
                 {/* Total del carrito */}
                 <div className="mt-3 text-right">
-                  <h4 className="fw-bold">Total: {getTotalPrice().toFixed(2)}€</h4>
+                  <h4 className="fw-bold">Total: {currencySymbol}{getConvertedPrice(getTotalPrice()).toFixed(2)}</h4>
                 </div>
 
                 {/* Mostrar la fecha estimada de entrega */}
@@ -171,7 +181,7 @@ function OrderConfirm() {
 
       {/* Total Final */}
       <div className="text-right mt-4">
-        <h3 className="fw-bold">Total del Pedido: {getTotalPrice().toFixed(2)}€</h3>
+        <h3 className="fw-bold">Total del Pedido: {currencySymbol}{getConvertedPrice(getTotalPrice()).toFixed(2)}</h3>
       </div>
     </div>
   );

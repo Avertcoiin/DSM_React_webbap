@@ -4,6 +4,7 @@ import { get, ref, update, onValue, remove } from "firebase/database";
 import { onAuthStateChanged } from "firebase/auth";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Modal, Button } from 'react-bootstrap';
+import { useConversion } from "../context/ConversionContext";
 
 function Pedidos() {
   const [orders, setOrders] = useState([]);
@@ -11,6 +12,12 @@ function Pedidos() {
   const [showModal, setShowModal] = useState(false);
   const [orderToDelete, setOrderToDelete] = useState(null);
   const [expandedOrderId, setExpandedOrderId] = useState(null); // Estado para controlar el despliegue
+  const { conversionRate, currencySymbol } = useConversion();
+
+  // Función para obtener el precio convertido
+  const getConvertedPrice = (price) => {
+    return price * conversionRate; // Multiplicamos el precio por la tasa de conversión
+  };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -134,7 +141,7 @@ function Pedidos() {
               <li key={order.id} className="list-group-item">
                 <div className="d-flex justify-content-between align-items-center">
                   <span>{new Date(order.timestamp).toLocaleString()}</span>
-                  <span>{order.totalPrice.toFixed(2)}€</span>
+                  <span>{currencySymbol}{getConvertedPrice(order.totalPrice).toFixed(2)}</span>
                   <button
                     className="btn btn-link"
                     onClick={() => toggleExpand(order.id)}
@@ -149,7 +156,7 @@ function Pedidos() {
                       <li key={index} className="list-group-item d-flex justify-content-between align-items-center">
                         <img src={item.archivo} alt={item.nombre} className="img-thumbnail" style={{ width: '50px', height: '50px' }} />
                         <span>{item.nombre}</span>
-                        <span>{item.cantidad} x {item.precio}€</span>
+                        <span>{item.cantidad} x {currencySymbol}{getConvertedPrice(item.precio).toFixed(2)}</span> 
                       </li>
                     ))}
                   </ul>
