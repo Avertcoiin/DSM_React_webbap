@@ -10,6 +10,8 @@ import { useRoute } from "../../context/RouteContext"; // Importar useRoute
 import { Dropdown } from "react-bootstrap";
 import currency from "currency.js"; // Importamos currency.js
 import Conversion from "../Conversion"; // Importamos el hook
+import Select from "react-select"; // Importamos react-select
+import Flag from "react-world-flags"; // Importamos react-world-flags para las banderas
 
 function Header() {
   const navigate = useNavigate();
@@ -23,17 +25,17 @@ function Header() {
   const prevLocationRef = useRef(location.pathname); // Usamos useRef para almacenar la ruta anterior
   const { rates, loading, error } = Conversion(); // Usamos el hook actualizado
 
-  // Definir los países y sus monedas
+  // Definir los países, monedas y banderas
   const countries = [
-    { name: "España", code: "EU", currency: "EUR" },
-    { name: "Estados Unidos", code: "US", currency: "USD" },
-    { name: "Reino Unido", code: "GB", currency: "GBP" },
-    { name: "Canadá", code: "CA", currency: "CAD" },
+    { label: "España", value: "EU", currency: "EUR", flag: "EU" },
+    { label: "Estados Unidos", value: "US", currency: "USD", flag: "US" },
+    { label: "Reino Unido", value: "GB", currency: "GBP", flag: "GB" },
+    { label: "Canadá", value: "CA", currency: "CAD", flag: "CA" },
   ];
 
   // Función para manejar la selección del país
-  const handleCountryChange = (countryCode) => {
-    setSelectedCountry(countryCode);
+  const handleCountryChange = (selectedOption) => {
+    setSelectedCountry(selectedOption.value);
   };
 
   // Función para obtener el precio total formateado con la moneda seleccionada
@@ -41,16 +43,16 @@ function Header() {
     if (loading) return "Cargando..."; // Mostramos un mensaje mientras se cargan las tasas
     if (error) return "Error al cargar tasas de cambio"; // Mostramos un mensaje si hubo un error
 
-    const country = countries.find((c) => c.code === selectedCountry);
+    const country = countries.find((c) => c.value === selectedCountry);
     if (country) {
       // Usamos las tasas de conversión reales obtenidas
       const conversionRate = rates[country.currency]; // Obtenemos la tasa de conversión
       if (conversionRate) {
         const convertedPrice = currency(price).multiply(conversionRate); // Multiplicamos el precio
-        return convertedPrice.value.toFixed(2); // Retornamos el valor formateado sin el símbolo de moneda
+        return convertedPrice.format(); // Retornamos el precio formateado con el símbolo de moneda
       }
     }
-    return currency(price).value.toFixed(2); // Si no se encuentra, devuelve el precio en euros
+    return currency(price).format(); // Si no se encuentra, devuelve el precio en euros
   };
 
   // Función para obtener el símbolo de la moneda
@@ -131,8 +133,7 @@ function Header() {
           </span>
         </div>
         <div className="total mx-3 text-light">
-          {/* Aquí concatenamos el símbolo de la moneda antes del precio */}
-          <span>Total: {getCurrencySymbol(countries.find((c) => c.code === selectedCountry)?.currency)} {getFormattedPrice(totalPrecio)}</span>
+          <span>Total: {getCurrencySymbol(countries.find((c) => c.value === selectedCountry)?.currency)} {getFormattedPrice(totalPrecio)}</span>
         </div>
         <div className="session-order mx-3">
           <button className="btn btn-success" onClick={handleOrderClick}>
@@ -158,13 +159,26 @@ function Header() {
           )}
         </div>
         <div className="country-select mx-3">
-          <select className="form-control" onChange={(e) => handleCountryChange(e.target.value)} value={selectedCountry}>
-            {countries.map((country) => (
-              <option key={country.code} value={country.code}>
-                {country.name}
-              </option>
-            ))}
-          </select>
+          <Select
+            options={countries.map((country) => ({
+              value: country.value,
+              label: (
+                <div className="d-flex align-items-center">
+                  <Flag code={country.flag} style={{ width: "20px", marginRight: "10px" }} />
+                  <span>{country.label}</span>
+                </div>
+              ),
+            }))}
+            onChange={handleCountryChange}
+            value={countries.find((c) => c.value === selectedCountry)}
+            getOptionLabel={(e) => e.label} // Usamos el label personalizado para que muestre la bandera
+            formatOptionLabel={(data) => (
+              <div className="d-flex align-items-center">
+                <Flag code={data.flag} style={{ width: "20px", marginRight: "10px" }} />
+                <span>{data.label}</span>
+              </div>
+            )}
+          />
         </div>
       </div>
     </header>
