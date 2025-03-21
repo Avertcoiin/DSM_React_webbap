@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { db } from '../firebase'; 
 import { ref, get } from 'firebase/database'; 
 import { useCart } from '../context/CartContext'; 
+import 'animate.css';
 import ProductCarousel from '../components/ProductCarrousel'; 
 import { useSearch } from '../context/SearchContext'; // Usamos el hook del contexto de búsqueda
 
@@ -51,7 +52,7 @@ function Home() {
 
   return (
     <div className="container my-5">
-      <h2 className="text-center mb-4">Bienvenidos a nuestra tienda</h2>
+      <h2 className="text-center mb-4 animate__animated animate__rubberBand">Bienvenidos a nuestra tienda</h2>
       <ProductCarousel productos={productosFiltrados} />
     </div>
   );

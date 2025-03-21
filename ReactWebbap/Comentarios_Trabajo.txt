@@ -4,6 +4,7 @@ COSAS PENDIENTES:
   - Autorellenar correo en el formulario
   - Si me pide iniciar sesión para comprar e inicio en vez de llevarme al home al iniciar tendría que ir a la lista de las cosas
   - Si seleccionas todos los productos no deja comprar. Mirar por qué.
+  - Al pasar a comprar los datos del firebase los toma de la última vez que se recargó la página. Habría que mirar si cambiar eso por lo datos actualizados desde firebase.
 
 ESPECIFICACIONES QUE FALTAN POR HACER:
 Desplegar el proyecto una vez acabado.
