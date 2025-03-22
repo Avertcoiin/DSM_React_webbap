@@ -103,6 +103,15 @@ function Header() {
     setRating(minRating);
   }, [maxPrice, minRating]);
 
+  const resetFilters = () => {
+    setSearchQuery("");
+    setSearchTerm("");
+    setPriceRange(1000);
+    setMaxPrice(Infinity);
+    setRating(0);
+    setMinRating(0);
+  };
+
   const totalCantidad = cartItems.reduce((acc, item) => acc + item.cantidad, 0);
   const totalPrecio = getTotalPrice();
 
@@ -218,43 +227,57 @@ function Header() {
       </div>
 
       {showFilters && (
-        <div className="filters-dropdown bg-light p-3 position-absolute top-100 start-0 w-100 shadow-lg d-flex flex-wrap gap-4 fade-in">
-          <div className="price-filter" style={{ minWidth: "250px", flex: "1" }}>
-            <label htmlFor="priceRange">Precio máximo:</label>
-            <Slider
-              id="priceRange"
-              min={0}
-              max={1000}
-              value={priceRange}
-              onChange={(event, newValue) => {
-                setPriceRange(newValue);
-                setMaxPrice(newValue);
-              }}
-            />
-            <div>
-              Precio: {getCurrencySymbol(countries.find((c) => c.value === selectedCountry)?.currency)} {priceRange}
+        <div className="filters-dropdown bg-light p-3 position-absolute top-100 start-0 w-100 shadow-lg d-flex flex-wrap align-items-center fade-in">
+
+          <div className="d-flex flex-grow-1 flex-wrap align-items-center gap-4" style={{ flex: "1" }}>
+            <div className="price-filter me-4" style={{ flex: "0 1 40%", minWidth: "250px" }}>
+              <label htmlFor="priceRange">Precio máximo:</label>
+              <Slider
+                id="priceRange"
+                min={0}
+                max={1000}
+                value={priceRange}
+                onChange={(event, newValue) => {
+                  setPriceRange(newValue);
+                  setMaxPrice(newValue);
+                }}
+              />
+              <div>
+                Precio: {getCurrencySymbol(countries.find((c) => c.value === selectedCountry)?.currency)} {priceRange}
+              </div>
+            </div>
+
+            <div className="rating-filter" style={{ flex: "0 1 50%", minWidth: "200px" }}>
+              <label>Valoración mínima:</label>
+              <div className="d-flex flex-wrap gap-2 mt-2">
+                {[0, 1, 2, 3, 4, 5].map((value) => (
+                  <button
+                    key={value}
+                    className={`btn btn-sm ${rating === value ? "btn-warning" : "btn-outline-secondary"}`}
+                    onClick={() => {
+                      setRating(value);
+                      setMinRating(value);
+                    }}
+                    aria-label={`Filtrar por ${value} estrellas o más`}
+                  >
+                    {[...Array(5)].map((_, i) => (
+                      <span key={i}>{i < value ? "★" : "☆"}</span>
+                    ))}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
-          <div className="rating-filter" style={{ minWidth: "150px", flex: "1" }}>
-            <label>Valoración mínima:</label>
-            <div className="d-flex flex-wrap gap-2 mt-2">
-              {[0, 1, 2, 3, 4, 5].map((value) => (
-                <button
-                  key={value}
-                  className={`btn btn-sm ${rating === value ? "btn-warning" : "btn-outline-secondary"}`}
-                  onClick={() => {
-                    setRating(value);
-                    setMinRating(value);
-                  }}
-                  aria-label={`Filtrar por ${value} estrellas o más`}
-                >
-                  {[...Array(5)].map((_, i) => (
-                    <span key={i}>{i < value ? "★" : "☆"}</span>
-                  ))}
-                </button>
-              ))}
-            </div>
+
+          <div
+            className="reset-filter d-flex justify-content-center align-items-center ms-auto"
+            style={{ flex: "0 1 10%", minWidth: "150px" }}
+          >
+            <button className="btn btn-outline-danger d-flex align-items-center gap-2" onClick={resetFilters}>
+              <i className="bi bi-arrow-counterclockwise"></i> Resetear
+            </button>
           </div>
+
         </div>
       )}
     </header>
