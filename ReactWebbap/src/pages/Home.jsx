@@ -1,16 +1,22 @@
 // src/pages/Home.jsx
+
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase'; 
 import { ref, get } from 'firebase/database'; 
 import { useCart } from '../context/CartContext'; 
 import 'animate.css';
 import ProductCarousel from '../components/ProductCarrousel'; 
-import { useSearch } from '../context/SearchContext'; // Usamos el hook del contexto de búsqueda
+import { useSearch } from '../context/SearchContext';
 
 function Home() {
   const [productos, setProductos] = useState([]);
   const { cartItems } = useCart();
-  const { searchTerm } = useSearch(); // Obtenemos el término de búsqueda del contexto
+  const {
+    searchTerm,
+    minPrice,
+    maxPrice,
+    minRating
+  } = useSearch(); // Obtenemos todos los filtros del contexto
 
   useEffect(() => {
     const productosRef = ref(db, 'productos'); 
@@ -26,11 +32,7 @@ function Home() {
             };
 
             const cartItem = cartItems.find(item => item.id === producto.id);
-            if (cartItem) {
-              producto.cantidad = cartItem.cantidad;
-            } else {
-              producto.cantidad = 0;
-            }
+            producto.cantidad = cartItem ? cartItem.cantidad : 0;
 
             productosArray.push(producto);
           });
@@ -45,10 +47,13 @@ function Home() {
       });
   }, [cartItems]);
 
-  // Filtramos los productos usando el searchTerm
-  const productosFiltrados = productos.filter((producto) =>
-    producto.nombre.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Filtros combinados
+  const productosFiltrados = productos.filter((producto) => {
+    const nombreMatch = producto.nombre.toLowerCase().includes(searchTerm.toLowerCase());
+    const precioMatch = producto.precio >= minPrice && producto.precio <= maxPrice;
+    const ratingMatch = producto.rating >= minRating;
+    return nombreMatch && precioMatch && ratingMatch;
+  });
 
   return (
     <div className="container my-5">

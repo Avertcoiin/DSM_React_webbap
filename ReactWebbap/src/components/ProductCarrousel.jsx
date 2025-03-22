@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useCart } from '../context/CartContext';
 import { useConversion } from '../context/ConversionContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import 'font-awesome/css/font-awesome.min.css';
+import 'font-awesome/css/font-awesome.min.css'; 
 
 function ProductCarousel({ productos }) {
   const { addToCart, cartItems } = useCart(); // Accedemos al método getTotalPrice del contexto

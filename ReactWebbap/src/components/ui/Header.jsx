@@ -20,7 +20,16 @@ function Header() {
   const navigate = useNavigate();
   const location = useLocation();
   const { cartItems, getTotalPrice } = useCart();
-  const { searchTerm, setSearchTerm } = useSearch();
+  const {
+    searchTerm,
+    setSearchTerm,
+    minPrice,
+    setMinPrice,
+    maxPrice,
+    setMaxPrice,
+    minRating,
+    setMinRating,
+  } = useSearch();
   const { setDesiredRoute } = useRoute();
   const [user, setUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState(searchTerm);
@@ -88,6 +97,11 @@ function Header() {
     prevLocationRef.current = location.pathname;
     setShowFilters(false); // Cerrar filtros al cambiar de ruta
   }, [location.pathname]);
+
+  useEffect(() => {
+    setPriceRange(maxPrice === Infinity ? 1000 : maxPrice);
+    setRating(minRating);
+  }, [maxPrice, minRating]);
 
   const totalCantidad = cartItems.reduce((acc, item) => acc + item.cantidad, 0);
   const totalPrecio = getTotalPrice();
@@ -212,7 +226,10 @@ function Header() {
               min={0}
               max={1000}
               value={priceRange}
-              onChange={(event, newValue) => setPriceRange(newValue)}
+              onChange={(event, newValue) => {
+                setPriceRange(newValue);
+                setMaxPrice(newValue);
+              }}
             />
             <div>
               Precio: {getCurrencySymbol(countries.find((c) => c.value === selectedCountry)?.currency)} {priceRange}
@@ -225,7 +242,10 @@ function Header() {
                 <button
                   key={value}
                   className={`btn btn-sm ${rating === value ? "btn-warning" : "btn-outline-secondary"}`}
-                  onClick={() => setRating(value)}
+                  onClick={() => {
+                    setRating(value);
+                    setMinRating(value);
+                  }}
                   aria-label={`Filtrar por ${value} estrellas o más`}
                 >
                   {[...Array(5)].map((_, i) => (
