@@ -1,10 +1,2 @@
-COSAS PENDIENTES:
-  - El usuario puede ir manualmente a cualquier página. Sí que es verdad que de ninguna forma le deja hacer una compra si haber pagado. No registra nunca a menos que haya pagado. Podríamos poner algun límite o algo pero no es para nada grave.
-  - Librerías extras.
-  - Autorellenar correo en el formulario
-  - Si me pide iniciar sesión para comprar e inicio en vez de llevarme al home al iniciar tendría que ir a la lista de las cosas
-  - Si seleccionas todos los productos no deja comprar. Mirar por qué.
-  - Al pasar a comprar los datos del firebase los toma de la última vez que se recargó la página. Habría que mirar si cambiar eso por lo datos actualizados desde firebase.
-
-ESPECIFICACIONES QUE FALTAN POR HACER:
-Desplegar el proyecto una vez acabado.
+Despliegue:
+https://dsm-vertiz-muro-proyecto-react.web.app
