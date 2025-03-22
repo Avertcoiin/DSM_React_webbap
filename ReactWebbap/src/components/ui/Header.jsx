@@ -6,13 +6,15 @@ import logo from "../../assets/logo.png";
 import carrito from "../../assets/carrito.jpg";
 import { useCart } from "../../context/CartContext";
 import { useSearch } from "../../context/SearchContext";
-import { useRoute } from "../../context/RouteContext"; // Importar useRoute
-import { useConversion } from "../../context/ConversionContext"; // Importamos el contexto
+import { useRoute } from "../../context/RouteContext";
+import { useConversion } from "../../context/ConversionContext";
 import { Dropdown } from "react-bootstrap";
-import currency from "currency.js"; // Importamos currency.js
-import Conversion from "../Conversion"; // Importamos el hook
-import Select from "react-select"; // Importamos react-select
-import Flag from "react-world-flags"; // Importamos react-world-flags para las banderas
+import currency from "currency.js";
+import Conversion from "../Conversion";
+import Select from "react-select";
+import Flag from "react-world-flags";
+import Slider from '@mui/material/Slider';
+import Box from '@mui/material/Box';
 
 function Header() {
   const navigate = useNavigate();
@@ -23,11 +25,13 @@ function Header() {
   const [user, setUser] = useState(null);
   const [searchQuery, setSearchQuery] = useState(searchTerm);
   const [selectedCountry, setSelectedCountry] = useState("EU");
-  const prevLocationRef = useRef(location.pathname); // Usamos useRef para almacenar la ruta anterior
-  const { rates, loading, error } = Conversion(); // Usamos el hook actualizado
+  const [showFilters, setShowFilters] = useState(false);
+  const [priceRange, setPriceRange] = useState(500);
+  const [rating, setRating] = useState(0);
+  const prevLocationRef = useRef(location.pathname);
+  const { rates, loading, error } = Conversion();
   const { updateConversion } = useConversion();
 
-  // Definir los países, monedas y banderas
   const countries = [
     { label: "España", value: "EU", currency: "EUR", flag: "ES" },
     { label: "Estados Unidos", value: "US", currency: "USD", flag: "US" },
@@ -36,35 +40,28 @@ function Header() {
   ];
 
   const handleCountryChange = (selectedOption) => {
-    setSelectedCountry(selectedOption.value); // Actualizamos el país seleccionado
-  
-    // Actualizamos la moneda y el factor de conversión
+    setSelectedCountry(selectedOption.value);
     const country = countries.find((c) => c.value === selectedOption.value);
     if (country) {
-      const conversionRate = rates[country.currency]; // Obtenemos la tasa de conversión de la moneda seleccionada
-      updateConversion(country.currency, conversionRate); // Llamamos a la función de actualización del contexto
+      const conversionRate = rates[country.currency];
+      updateConversion(country.currency, conversionRate);
     }
   };
 
-
-  // Función para obtener el precio total formateado con la moneda seleccionada
   const getFormattedPrice = (price) => {
-    if (loading) return "Cargando..."; // Mostramos un mensaje mientras se cargan las tasas
-    if (error) return "Error al cargar tasas de cambio"; // Mostramos un mensaje si hubo un error
-
+    if (loading) return "Cargando...";
+    if (error) return "Error al cargar tasas de cambio";
     const country = countries.find((c) => c.value === selectedCountry);
     if (country) {
-      // Usamos las tasas de conversión reales obtenidas
-      const conversionRate = rates[country.currency]; // Obtenemos la tasa de conversión
+      const conversionRate = rates[country.currency];
       if (conversionRate) {
-        const convertedPrice = currency(price).multiply(conversionRate); // Multiplicamos el precio
-        return convertedPrice.value; // Retornamos solo el valor numérico
+        const convertedPrice = currency(price).multiply(conversionRate);
+        return convertedPrice.value;
       }
     }
-    return currency(price).value; // Si no se encuentra, devuelve el valor en euros
+    return currency(price).value;
   };
 
-  // Función para obtener el símbolo de la moneda
   const getCurrencySymbol = (currencyCode) => {
     const currencySymbols = {
       EUR: "€",
@@ -79,7 +76,6 @@ function Header() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user ? user : null);
     });
-
     return () => unsubscribe();
   }, []);
 
@@ -89,33 +85,34 @@ function Header() {
   };
 
   useEffect(() => {
-    prevLocationRef.current = location.pathname; // Actualizamos la ruta anterior en cada renderizado
+    prevLocationRef.current = location.pathname;
+    setShowFilters(false); // Cerrar filtros al cambiar de ruta
   }, [location.pathname]);
 
   const totalCantidad = cartItems.reduce((acc, item) => acc + item.cantidad, 0);
-  const totalPrecio = getTotalPrice(); // Precio total en euros
+  const totalPrecio = getTotalPrice();
 
   const handleOrderClick = () => {
     if (!user) {
       if (location.pathname === "/login") {
-        navigate("/"); // Redirigimos a inicio si no hay usuario
+        navigate("/");
       } else {
         setDesiredRoute("/order-confirm");
         navigate("/login");
       }
     } else if (location.pathname === "/") {
-      navigate("/order-confirm"); // Confirmamos pedido si estamos en la página principal
+      navigate("/order-confirm");
     } else if (location.pathname === "/thank-you" || prevLocationRef.current === location.pathname) {
-      navigate("/"); // Volvemos al inicio
+      navigate("/");
     } else {
-      navigate(-1); // Regresamos a la página anterior
+      navigate(-1);
     }
   };
 
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigate("/"); // Logout y redirigir al inicio
+      navigate("/");
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
     }
@@ -125,15 +122,27 @@ function Header() {
     <header className="d-flex align-items-center justify-content-between p-3 bg-dark fixed-top">
       <div className="d-flex align-items-center">
         <img src={logo} alt="Logo" className="logo" style={{ height: "50px" }} />
-        <input
-          type="text"
-          placeholder="Buscar..."
-          value={searchQuery}
-          onChange={handleSearchChange}
-          className="form-control mx-3"
-          style={{ maxWidth: "300px" }}
-        />
+
+        <div className="d-flex align-items-center mx-3">
+          <input
+            type="text"
+            placeholder="Buscar por nombre..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            className="form-control"
+            style={{ maxWidth: "250px" }}
+            aria-label="Buscar productos"
+          />
+          <button
+            className="btn btn-secondary ms-2 px-3 py-2"
+            style={{ whiteSpace: "nowrap" }}
+            onClick={() => setShowFilters(!showFilters)}
+          >
+            {showFilters ? "Ocultar Filtros" : "Filtros"}
+          </button>
+        </div>
       </div>
+
       <div className="d-flex align-items-center">
         <div className="cart mx-3 position-relative">
           <img src={carrito} alt="Carrito" style={{ height: "40px" }} />
@@ -183,7 +192,7 @@ function Header() {
             }))}
             onChange={handleCountryChange}
             value={countries.find((c) => c.value === selectedCountry)}
-            getOptionLabel={(e) => e.label} // Usamos el label personalizado para que muestre la bandera
+            getOptionLabel={(e) => e.label}
             formatOptionLabel={(data) => (
               <div className="d-flex align-items-center">
                 <Flag code={data.flag} style={{ width: "20px", marginRight: "10px" }} />
@@ -193,6 +202,41 @@ function Header() {
           />
         </div>
       </div>
+
+      {showFilters && (
+        <div className="filters-dropdown bg-light p-3 position-absolute top-100 start-0 w-100 shadow-lg d-flex flex-wrap gap-4 fade-in">
+          <div className="price-filter" style={{ minWidth: "250px", flex: "1" }}>
+            <label htmlFor="priceRange">Precio máximo:</label>
+            <Slider
+              id="priceRange"
+              min={0}
+              max={1000}
+              value={priceRange}
+              onChange={(event, newValue) => setPriceRange(newValue)}
+            />
+            <div>
+              Precio: {getCurrencySymbol(countries.find((c) => c.value === selectedCountry)?.currency)} {priceRange}
+            </div>
+          </div>
+          <div className="rating-filter" style={{ minWidth: "150px", flex: "1" }}>
+            <label>Valoración mínima:</label>
+            <div className="d-flex flex-wrap gap-2 mt-2">
+              {[0, 1, 2, 3, 4, 5].map((value) => (
+                <button
+                  key={value}
+                  className={`btn btn-sm ${rating === value ? "btn-warning" : "btn-outline-secondary"}`}
+                  onClick={() => setRating(value)}
+                  aria-label={`Filtrar por ${value} estrellas o más`}
+                >
+                  {[...Array(5)].map((_, i) => (
+                    <span key={i}>{i < value ? "★" : "☆"}</span>
+                  ))}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }

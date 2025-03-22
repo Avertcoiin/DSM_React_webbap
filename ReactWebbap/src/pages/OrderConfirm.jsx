@@ -6,14 +6,12 @@ import { db } from "../firebase"; // Asegúrate de que la ruta sea correcta
 import { ref, get } from "firebase/database"; // Importamos get() para obtener datos de Firebase
 import { useConversion } from "../context/ConversionContext"; // Asegúrate de importar el hook del contexto
 
-
 function OrderConfirm() {
   const { cartItems, getTotalPrice, clearCart } = useCart(); // Obtenemos los productos del carrito, el precio total y la función para borrar
   const navigate = useNavigate();
   const [stockAvailability, setStockAvailability] = useState({}); // Estado para almacenar la disponibilidad de stock
   const [errorMessage, setErrorMessage] = useState(""); // Estado para manejar los mensajes de error
   const { conversionRate, currencySymbol } = useConversion(); // Obtener el rate de conversión y símbolo
-
 
   // Función para obtener el tiempo estimado de envío
   const getEstimatedShippingTime = () => {
@@ -41,7 +39,6 @@ function OrderConfirm() {
   const getConvertedPrice = (price) => {
     return price * conversionRate; // Multiplicamos el precio por la tasa de conversión
   };
-
 
   // Función para comprobar la disponibilidad del stock
   const checkStockAvailability = async () => {
